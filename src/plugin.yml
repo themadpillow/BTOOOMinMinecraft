@@ -1,0 +1,26 @@
+name: Btooom
+version: 1.0.0
+main: btooom.GameManager
+softdepend: [ActionBarAPI]
+commands:
+ start:
+   usage: /<command> [true/false]
+   permission: op
+   permission-message: "§4このコマンドを実行するための権限がありません！"
+ set:
+   usage: /<command>
+   permission: op
+   permission-message: "§4このコマンドを実行するための権限がありません！"
+ s:
+   usage: /<command>
+ shop:
+   usage: /<command>
+ spawn:
+   usage: /<command>
+ debug:
+   usage: /<command>
+   permission: op
+   permission-message: "§4このコマンドを実行するための権限がありません！"
+ permissions:
+  op:
+    default: op
