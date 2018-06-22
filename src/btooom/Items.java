@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Chest;
+import org.bukkit.SkullType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -13,7 +13,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import net.md_5.bungee.api.ChatColor;
 
 public class Items {
-	Chest chest = null;
 	ItemStack skull = null;
 	Inventory BuyBimInventory = null;
 	public void setBuyBimInventory(){
@@ -35,7 +34,7 @@ public class Items {
 			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.RED+"§lタイマーBIM");
 			if(type == 0)
-			lores.add("6 yen");
+				lores.add("6 yen");
 			else{
 				lores.add("左クリック  ：構える(カウントダウン)");
 				lores.add("右クリック  ：投げる");
@@ -77,10 +76,10 @@ public class Items {
 			}
 			break;
 		case 4:
-			item = skull;
+			item = new ItemStack(Material.SKULL_ITEM, 1, (short) 3, (byte) SkullType.PLAYER.ordinal());
 			SkullMeta skullmeta =  (SkullMeta)item.getItemMeta();
-
-					skullmeta.setDisplayName(ChatColor.GREEN+"§l設置BIM");
+			skullmeta.setOwner("MHF_TNT");
+			skullmeta.setDisplayName(ChatColor.GREEN+"§l設置BIM");
 			if(type == 0)
 				lores.add("30 yen");
 			else{
@@ -91,7 +90,7 @@ public class Items {
 			skullmeta.setLore(lores);
 			item.setItemMeta(skullmeta);
 			return item;
-	//		break;
+			//		break;
 		}
 
 		meta.setLore(lores);

@@ -12,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -72,8 +71,6 @@ public class GameManager extends JavaPlugin implements Listener {
 		HomingBim HomingBim = new HomingBim();
 		HomingBim.GameManager = this;
 
-		Items.chest = (Chest)((new Location(Bukkit.getWorlds().get(0), -10, 47, 6)).getBlock().getState());
-		Items.skull = Items.chest.getInventory().getItem(0);
 		Items.setBuyBimInventory();
 
 		board = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -117,11 +114,10 @@ public class GameManager extends JavaPlugin implements Listener {
 				((Player)entity).removePotionEffect(PotionEffectType.INVISIBILITY);
 
 			}
-			else if(entity instanceof Item){
-				entity.remove();
-			}
 		}
 
+		for(Player p : Bukkit.getOnlinePlayers())
+			p.getInventory().addItem(Items.bims((byte)4, (byte)1));
 	}
 	public void onDisable(){
 		if(info != null)
