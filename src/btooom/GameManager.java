@@ -22,8 +22,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BlockIterator;
@@ -59,6 +61,8 @@ public class GameManager extends JavaPlugin implements Listener {
 
 	public final String header = ChatColor.GREEN+"§l[BTOOOM] ";
 
+	FileConfiguration config = this.getConfig();
+
 	public void onEnable(){
 		TimerBim TimerBim = new TimerBim();
 		TimerBim.GameManager = this;
@@ -71,6 +75,11 @@ public class GameManager extends JavaPlugin implements Listener {
 		HomingBim HomingBim = new HomingBim();
 		HomingBim.GameManager = this;
 
+		if(config.get("Timer") == null){
+			config.set("Timer", true);
+			this.saveConfig();
+		}
+
 		Items.setBuyBimInventory();
 
 		board = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -82,16 +91,19 @@ public class GameManager extends JavaPlugin implements Listener {
 		team.setAllowFriendlyFire(true);
 		team.setNameTagVisibility(NameTagVisibility.HIDE_FOR_OWN_TEAM);
 
-		//	if(board.getObjective(ChatColor.DARK_GREEN+"BTOOOM!") == null)
-		//		info = board.registerNewObjective(ChatColor.DARK_GREEN+"BTOOOM!", "info");
-		//	else
-		//		info = board.getObjective(ChatColor.DARK_GREEN+"BTOOOM!");
-		//		info.setDisplaySlot(DisplaySlot.SIDEBAR);
+		if((boolean)config.get("Timer")){
+			if(board.getObjective(ChatColor.DARK_GREEN+"BTOOOM!") == null)
+				info = board.registerNewObjective(ChatColor.DARK_GREEN+"BTOOOM!", "info");
+			else
+				info = board.getObjective(ChatColor.DARK_GREEN+"BTOOOM!");
+			info.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-		//	Score score = info.getScore("試合開始前です");
-		//	score.setScore(0);
+			Score score = info.getScore("試合開始前です");
+			score.setScore(0);
+		}
 
 		loc = new Location(Bukkit.getWorlds().get(0), 0, 55, 0);
+
 		Commands Commands = new Commands(this);
 		getCommand("start").setExecutor(Commands);
 		getCommand("set").setExecutor(Commands);
@@ -127,8 +139,13 @@ public class GameManager extends JavaPlugin implements Listener {
 	}
 
 	public void start(){
+
+
 		for(Player p : Bukkit.getOnlinePlayers()){
-			//Timer.timer(20, 20);
+
+			if((boolean)config.get("Timer"))
+				Timer.timer(20, 20);
+
 			alivelist.add(p);
 			canThrow.put(p, false);
 			canBuy.put(p, true);
@@ -226,7 +243,9 @@ public class GameManager extends JavaPlugin implements Listener {
 
 
 	public void gameover(Player winner, boolean sixstar){
-		//	Timer.TimerTaskID.cancel();
+
+		if((boolean)config.get("Timer"))
+			Timer.TimerTaskID.cancel();
 		GameManager.isStart = false;
 
 		FileConfiguration config = this.getConfig();

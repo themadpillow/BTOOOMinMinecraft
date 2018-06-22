@@ -22,7 +22,13 @@ public class Commands implements CommandExecutor {
 
 		if(cmd.getName().equalsIgnoreCase("start"))
 		{
-			GameManager.start();
+			if(config.get("LobbyLocation") == null){
+				sender.sendMessage(GameManager.header+"LobbyLocationが設定されていません。");
+				sender.sendMessage(GameManager.header+"座標に立ち、/set LobbyLocation で設定できます");
+			}
+			else{
+					GameManager.start();
+			}
 			return true;
 		}
 

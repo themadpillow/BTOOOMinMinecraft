@@ -19,7 +19,7 @@ public class Timer {
 	static int SEC;
 	static String s;
 	static Score timer;
-	static BukkitTask TimerTaskID;
+	public static BukkitTask TimerTaskID;
 
 	public static void timer(int min, int sec)
 	{
