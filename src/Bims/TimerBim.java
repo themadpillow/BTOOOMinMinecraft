@@ -30,7 +30,11 @@ public class TimerBim {
 					GameManager.HandTimerBim.put(p, null);
 					return;
 				}
-				p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 3F);
+				/*
+				 * 1.8
+				 * p.playSound(p.getLocation(), Sound.CLICK, 0.5F, 3F);
+				 */
+				p.playSound(p.getLocation(), Sound.BLOCK_LEVER_CLICK, 0.5F, 3F);
 		//		String s = "";
 		//		for(int i = 0; i < timer; i ++){
 		//			s = s.concat("⬛");
@@ -44,9 +48,17 @@ public class TimerBim {
 				this.cancel();
 				GameManager.HandTimerBim.put(p, null);
 				if(bim == null){
-					p.playSound(p.getLocation(), Sound.NOTE_PIANO, 1, (byte)4);
-					new BukkitRunnable(){public void run(){
+					/*
+					 * 1.8
 						p.playSound(p.getLocation(), Sound.NOTE_PIANO, 1, (byte)4);
+					 */
+					p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, (byte)4);
+					new BukkitRunnable(){public void run(){
+						/*
+						 * 1.8
+						 * p.playSound(p.getLocation(), Sound.NOTE_PIANO, 1, (byte)4);
+						 */
+						p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, (byte)4);
 					}}.runTaskLater(GameManager, 1L);
 					return;
 				}

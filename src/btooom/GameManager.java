@@ -178,7 +178,12 @@ public class GameManager extends JavaPlugin implements Listener {
 			Bukkit.broadcastMessage(header+ChatColor.LIGHT_PURPLE+"試合開始です");
 			for(Player p : Bukkit.getOnlinePlayers()){
 				canThrow.put(p, true);
-				p.playSound(p.getLocation().add(0,5,0), Sound.FIREWORK_LARGE_BLAST, 1F, 1F);
+				/*
+				 * 1.8
+				 * p.playSound(p.getLocation().add(0,5,0), Sound.FIREWORK_LARGE_BLAST, 1F, 1F);
+
+				 */
+				p.playSound(p.getLocation().add(0,5,0), Sound.ENTITY_FIREWORK_LARGE_BLAST, 1F, 1F);
 				TitleSender.sendTitle(p, ChatColor.GREEN+"§lBTOOOM !", "");
 			}
 		}}.runTaskLater(this, 380);
@@ -267,7 +272,12 @@ public class GameManager extends JavaPlugin implements Listener {
 				}
 				p.teleport((Location) config.get("LobbyLocation"), TeleportCause.ENDER_PEARL);
 				TitleSender.sendTitle(p, ChatColor.DARK_RED+"勝者:"+ChatColor.DARK_GREEN+winner.getName(), ChatColor.YELLOW+"獲得クリスタル数："+star+"個");
+				/*
+				 * 1.8
+				 *
 				p.playSound(p.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+				 */
+				p.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 1F, 1F);
 
 				p.getInventory().clear();
 
@@ -285,7 +295,7 @@ public class GameManager extends JavaPlugin implements Listener {
 					all.sendMessage(header+ChatColor.RED+winner.getName()+"さんがクリスタルを6個以上集めました");
 					all.teleport((Location) config.get("LobbyLocation"), TeleportCause.ENDER_PEARL);
 					TitleSender.sendTitle(all, ChatColor.DARK_RED+"勝者:"+ChatColor.DARK_GREEN+winner.getName(), ChatColor.YELLOW+"獲得クリスタル数："+star+"個");
-					all.playSound(p.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+					all.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 1F, 1F);
 					all.getInventory().clear();
 					all.setGameMode(GameMode.SURVIVAL);
 				}
@@ -296,7 +306,7 @@ public class GameManager extends JavaPlugin implements Listener {
 				all.sendMessage(header+ChatColor.RED+winner.getName()+"さんが最後の生存者です");
 				all.teleport((Location) config.get("LobbyLocation"), TeleportCause.ENDER_PEARL);
 				TitleSender.sendTitle(all, ChatColor.DARK_RED+"勝者:"+ChatColor.DARK_GREEN+winner.getName(), ChatColor.YELLOW+"獲得クリスタル数："+star+"個");
-				all.playSound(all.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+				all.playSound(all.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 1F, 1F);
 				all.getInventory().clear();
 
 				all.setGameMode(GameMode.SURVIVAL);

@@ -55,7 +55,11 @@ public class FlameBim {
 						}
 					}
 				}
+				/*
+				 *
 				Bukkit.getWorlds().get(0).playSound(loc, Sound.FIZZ, 0.5F, 1);
+				 */
+				Bukkit.getWorlds().get(0).playSound(loc, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.5F, 1);
 				new BukkitRunnable(){public void run(){
 					x ++;
 					if(x > 4)
@@ -67,7 +71,7 @@ public class FlameBim {
 							}
 						}
 						fire(loc.clone().add(x, y+1, 0));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.FIZZ, 1/x*0.2F, 1);
+						Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1/x*0.2F, 1);
 					}
 					else{
 						for(y = 1; y < x+1; y ++){
@@ -76,7 +80,7 @@ public class FlameBim {
 							}
 						}
 						fire(loc.clone().add(x, y, 0));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.FIZZ, 1/x*0.2F, 1);
+						Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1/x*0.2F, 1);
 					}
 					if(loc.clone().add(-x, 0, 0).getBlock().getType() == Material.AIR){
 						for(y = -1; -y < x+1; y --){
@@ -85,7 +89,7 @@ public class FlameBim {
 							}
 						}
 						fire(loc.clone().add(-x, y+1, 0));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(-x, y, 0), Sound.FIZZ, 1/x*0.2F, 1);
+						Bukkit.getWorlds().get(0).playSound(loc.clone().add(-x, y, 0), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1/x*0.2F, 1);
 					}
 					else{
 						for(y = 1; y < x+1; y ++){
@@ -94,7 +98,7 @@ public class FlameBim {
 							}
 						}
 						fire(loc.clone().add(-x, y, 0));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.FIZZ, 1/x*0.2F, 1);
+						Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1/x*0.2F, 1);
 					}
 
 					z ++;
@@ -107,7 +111,7 @@ public class FlameBim {
 							}
 						}
 						fire(loc.clone().add(0, y+1, z));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, z), Sound.FIZZ, 1/x*0.2F, 1);
+						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, z), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1/x*0.2F, 1);
 					}
 					else{
 						for(y = 1; y < z+1; y ++){
@@ -116,7 +120,7 @@ public class FlameBim {
 							}
 						}
 						fire(loc.clone().add(0, y, z));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, z), Sound.FIZZ, 1/x*0.2F, 1);
+						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, z), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1/x*0.2F, 1);
 					}
 					if(loc.clone().add(0, 0, -z).getBlock().getType() == Material.AIR){
 						for(y = -1; -y < z+1; y --){
@@ -125,7 +129,7 @@ public class FlameBim {
 							}
 						}
 						fire(loc.clone().add(0, y+1, -z));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, -z), Sound.FIZZ, 1/x*0.2F, 1);
+						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, -z), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1/x*0.2F, 1);
 					}
 					else{
 						for(y = 1; y < z+1; y ++){
@@ -134,7 +138,7 @@ public class FlameBim {
 							}
 						}
 						fire(loc.clone().add(0, y, -z));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, -z), Sound.FIZZ, 1/x*0.2F, 1);
+						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, -z), Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 1/x*0.2F, 1);
 					}
 				}}.runTaskTimer(GameManager, 0L, x*15L);
 				bim.remove();
