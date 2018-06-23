@@ -53,12 +53,7 @@ public class Timer {
 				case 2:
 				case 1:
 					for(Player p : Bukkit.getOnlinePlayers())
-						/*
-						 * 1.8
-						 *
 						p.playSound(p.getLocation(), Sound.WOOD_CLICK, 1F, 1F);
-						 */
-						p.playSound(p.getLocation(), Sound.BLOCK_WOOD_BUTTON_CLICK_ON, 1F, 1F);
 					Bukkit.broadcastMessage(GameManager.header+ChatColor.LIGHT_PURPLE+"試合終了まで 5...");
 					break;
 				case 0:
