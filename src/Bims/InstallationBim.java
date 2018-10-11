@@ -16,35 +16,40 @@ public class InstallationBim {
 	Block bim = null;
 	Location loc;
 
-	public void set(Player p, Block block){
+	public void set(Player p, Block block) {
 		bim = block;
 		search(p);
-		new BukkitRunnable(){public void run(){
-			if(bim != null){
-				loc = bim.getLocation();
-				Bukkit.getWorlds().get(0).createExplosion(loc.getX(),loc.getY(),loc.getZ(), 2.5F, false, false);
-				bim.setType(Material.AIR);
-				bim = null;
+		new BukkitRunnable() {
+			public void run() {
+				if (bim != null) {
+					loc = bim.getLocation();
+					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(), 2.5F, false, false);
+					bim.setType(Material.AIR);
+					bim = null;
+				}
 			}
-		}}.runTaskLater(GameManager, 1200L);
+		}.runTaskLater(GameManager, 1200L);
 	}
-	public void search(Player p){
-		new BukkitRunnable(){public void run(){
-			if(bim == null){
-				this.cancel();
-				return;
+
+	public void search(Player p) {
+		new BukkitRunnable() {
+			public void run() {
+				if (bim == null) {
+					this.cancel();
+					return;
+				}
+				Location loc = bim.getLocation();
+				for (Entity e : Bukkit.getWorlds().get(0).getNearbyEntities(loc, 2F, 2F, 2F)) {
+					if ((e instanceof Player && ((Player) e).getGameMode() == GameMode.SPECTATOR)
+							|| e == p)
+						continue;
+					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(), 2.5F, false, false);
+					bim.setType(Material.AIR);
+					bim = null;
+					this.cancel();
+					break;
+				}
 			}
-			Location loc = bim.getLocation();
-			for(Entity e : Bukkit.getWorlds().get(0).getNearbyEntities(loc, 2F, 2F, 2F)){
-				if((e instanceof Player && ((Player)e).getGameMode() == GameMode.SPECTATOR)
-						||e == p)
-					continue;
-				Bukkit.getWorlds().get(0).createExplosion(loc.getX(),loc.getY(),loc.getZ(), 2.5F, false, false);
-				bim.setType(Material.AIR);
-				bim = null;
-				this.cancel();
-				break;
-			}
-		}}.runTaskTimer(GameManager, 0L, 1L);
+		}.runTaskTimer(GameManager, 0L, 1L);
 	}
 }

@@ -8,7 +8,7 @@ commands:
    permission: op
    permission-message: "§4このコマンドを実行するための権限がありません！"
  set:
-   usage: /<command>
+   usage: /<command> CenterLocation or WorldRange <直径範囲> 
    permission: op
    permission-message: "§4このコマンドを実行するための権限がありません！"
  s:

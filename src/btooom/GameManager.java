@@ -3,6 +3,7 @@ package btooom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -55,15 +56,13 @@ public class GameManager extends JavaPlugin implements Listener {
 	static Team team = null;
 	public static Objective info = null;
 
-	Location loc = null;
+	static List<Player> alivelist = new ArrayList<Player>();
 
-	static ArrayList<Player> alivelist = new ArrayList<Player>();
-
-	public final String header = ChatColor.GREEN+"§l[BTOOOM] ";
+	public final String header = ChatColor.GREEN + "§l[BTOOOM] ";
 
 	FileConfiguration config = this.getConfig();
 
-	public void onEnable(){
+	public void onEnable() {
 		TimerBim TimerBim = new TimerBim();
 		TimerBim.GameManager = this;
 		CrackerBim CrackerBim = new CrackerBim();
@@ -75,7 +74,7 @@ public class GameManager extends JavaPlugin implements Listener {
 		HomingBim HomingBim = new HomingBim();
 		HomingBim.GameManager = this;
 
-		if(config.get("Timer") == null){
+		if (config.get("Timer") == null) {
 			config.set("Timer", true);
 			this.saveConfig();
 		}
@@ -83,26 +82,26 @@ public class GameManager extends JavaPlugin implements Listener {
 		Items.setBuyBimInventory();
 
 		board = Bukkit.getScoreboardManager().getMainScoreboard();
-		if(board.getTeam("team") == null)
+		if (board.getTeam("team") == null) {
 			team = board.registerNewTeam("team");
-		else
+		} else {
 			team = board.getTeam("team");
+		}
 
 		team.setAllowFriendlyFire(true);
 		team.setNameTagVisibility(NameTagVisibility.HIDE_FOR_OWN_TEAM);
 
-		if((boolean)config.get("Timer")){
-			if(board.getObjective(ChatColor.DARK_GREEN+"BTOOOM!") == null)
-				info = board.registerNewObjective(ChatColor.DARK_GREEN+"BTOOOM!", "info");
-			else
-				info = board.getObjective(ChatColor.DARK_GREEN+"BTOOOM!");
+		if ((boolean) config.get("Timer")) {
+			if (board.getObjective(ChatColor.DARK_GREEN + "BTOOOM!") == null)
+				info = board.registerNewObjective(ChatColor.DARK_GREEN + "BTOOOM!", "info");
+			else {
+				info = board.getObjective(ChatColor.DARK_GREEN + "BTOOOM!");
+			}
 			info.setDisplaySlot(DisplaySlot.SIDEBAR);
 
 			Score score = info.getScore("試合開始前です");
 			score.setScore(0);
 		}
-
-		loc = new Location(Bukkit.getWorlds().get(0), 0, 55, 0);
 
 		Commands Commands = new Commands(this);
 		getCommand("start").setExecutor(Commands);
@@ -114,96 +113,107 @@ public class GameManager extends JavaPlugin implements Listener {
 
 		Bukkit.getPluginManager().registerEvents(new Events(this), this);
 
-		for(Entity entity : Bukkit.getWorlds().get(0).getEntities()){
-			if(entity instanceof Player){
-				if(((Player)entity).getGameMode() != GameMode.CREATIVE){
-					((Player)entity).getInventory().clear();
+		for (Entity entity : Bukkit.getWorlds().get(0).getEntities()) {
+			if (entity instanceof Player) {
+				if (((Player) entity).getGameMode() != GameMode.CREATIVE) {
+					((Player) entity).getInventory().clear();
 					entity.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
-					((Player)entity).setGameMode(GameMode.SURVIVAL);
+					((Player) entity).setGameMode(GameMode.SURVIVAL);
 				}
-				canThrow.put((Player)entity, false);
-				canBuy.put((Player)entity, false);
-				((Player)entity).removePotionEffect(PotionEffectType.INVISIBILITY);
+				canThrow.put((Player) entity, false);
+				canBuy.put((Player) entity, false);
+				((Player) entity).removePotionEffect(PotionEffectType.INVISIBILITY);
 
 			}
 		}
-
-		for(Player p : Bukkit.getOnlinePlayers())
-			p.getInventory().addItem(Items.bims((byte)4, (byte)1));
 	}
-	public void onDisable(){
-		if(info != null)
+
+	public void onDisable() {
+		if (info != null) {
 			info.unregister();
-		if(team != null)
+		}
+		if (team != null) {
 			team.unregister();
+		}
 	}
 
-	public void start(){
+	public void start() {
 
+		if ((boolean) config.get("Timer")) {
+			Timer.timer(20, 20);
+		}
 
-		for(Player p : Bukkit.getOnlinePlayers()){
-
-			if((boolean)config.get("Timer"))
-				Timer.timer(20, 20);
-
+		for (Player p : Bukkit.getOnlinePlayers()) {
 			alivelist.add(p);
 			canThrow.put(p, false);
 			canBuy.put(p, true);
 
 			p.getInventory().clear();
 			p.setGameMode(GameMode.SURVIVAL);
-			p.getInventory().setItem(0, Items.bims((byte)0, (byte)1));
-			for(int i = 0; i < 9; i ++){
-				p.getInventory().addItem(Items.bims((byte)0, (byte)1));
+			p.getInventory().setItem(0, Items.bims((byte) 0, (byte) 1));
+			for (int i = 0; i < 9; i++) {
+				p.getInventory().addItem(Items.bims((byte) 0, (byte) 1));
 			}
-			p.getInventory().setItem(8, Items.otherItem((byte)0));
+			p.getInventory().setItem(8, Items.otherItem((byte) 0));
 			team.addPlayer(p);
 			p.teleport(respawn());
 		}
 
 		money = new int[alivelist.size()];
 		Arrays.fill(money, 30);
-		new BukkitRunnable(){public void run(){
-			for(int i = 0; i < money.length; i ++){
-				money[i] += 5;
+		new BukkitRunnable() {
+			public void run() {
+				for (int i = 0; i < money.length; i++) {
+					money[i] += 5;
+				}
 			}
-		}}.runTaskTimer(this, 100L, 100L);
+		}.runTaskTimer(this, 100L, 100L);
 
-		Bukkit.broadcastMessage(header+ChatColor.RED+"20秒後に試合が開始します！");
-		Bukkit.broadcastMessage(header+ChatColor.RED+"準備時間の間は/spawnでスポーンし直すことが出来ます");
-		Bukkit.broadcastMessage(header+ChatColor.RED+"アイテムは試合開始後から使用可能です");
+		Bukkit.broadcastMessage(header + ChatColor.RED + "20秒後に試合が開始します！");
+		Bukkit.broadcastMessage(header + ChatColor.RED + "準備時間の間は/spawnでスポーンし直すことが出来ます");
+		Bukkit.broadcastMessage(header + ChatColor.RED + "アイテムは試合開始後から使用可能です");
 
-		new BukkitRunnable(){public void run(){
-			isStart = true;
-			Bukkit.broadcastMessage(header+ChatColor.LIGHT_PURPLE+"試合開始です");
-			for(Player p : Bukkit.getOnlinePlayers()){
-				canThrow.put(p, true);
-				p.playSound(p.getLocation().add(0,5,0), Sound.FIREWORK_LARGE_BLAST, 1F, 1F);
-				TitleSender.sendTitle(p, ChatColor.GREEN+"§lBTOOOM !", "");
+		new BukkitRunnable() {
+			public void run() {
+				isStart = true;
+				Bukkit.broadcastMessage(header + ChatColor.LIGHT_PURPLE + "試合開始です");
+				for (Player p : Bukkit.getOnlinePlayers()) {
+					canThrow.put(p, true);
+					p.playSound(p.getLocation().add(0, 5, 0), Sound.ENTITY_FIREWORK_LARGE_BLAST, 1F, 1F);
+					TitleSender.sendTitle(p, ChatColor.GREEN + "§lBTOOOM !", "");
+				}
 			}
-		}}.runTaskLater(this, 380);
-		new BukkitRunnable(){public void run(){
-			for(Player p : Bukkit.getOnlinePlayers())
-				TitleSender.resetTitle(p);
-		}}.runTaskLater(this, 440);
+		}.runTaskLater(this, 380);
+		new BukkitRunnable() {
+			public void run() {
+				for (Player p : Bukkit.getOnlinePlayers())
+					TitleSender.resetTitle(p);
+			}
+		}.runTaskLater(this, 440);
 	}
 
-	public Location respawn(){
+	public Location respawn() {
+		int range = Integer.parseInt((String) config.get("WorldRange"));
+		Location loc = (Location) config.get("CenterLocation");
 		Random ran = new Random();
-		int x = ran.nextInt(200);
-		int z = ran.nextInt(200);
-		if(ran.nextInt(2) == 0)
+		int x = ran.nextInt((int) (range / 2));
+		int z = ran.nextInt((int) (range / 2));
+		if (ran.nextInt(2) == 0) {
 			x = -x;
-		if(ran.nextInt(2) == 0)
+		}
+		if (ran.nextInt(2) == 0) {
 			z = -z;
-		for(int y = 0; ; y ++){
+		}
+		for (int y = 0;; y++) {
 			Location reloc = loc.clone().add(x, y, z);
-			if(reloc.getBlock().getType() == Material.STATIONARY_WATER){
-				x = ran.nextInt(200);
-				z = ran.nextInt(200);
+			if (reloc.getBlock().getType() == Material.STATIONARY_WATER
+					|| reloc.getBlock().getType() == Material.WATER
+					|| reloc.getBlock().getType() == Material.WATER_LILY) {
+				x = ran.nextInt(range / 2);
+				z = ran.nextInt(range / 2);
 				continue;
 			}
-			if(reloc.getBlock().getType() == Material.AIR){
+			if (reloc.getBlock().getType() == Material.AIR) {
 				return reloc;
 			}
 		}
@@ -214,22 +224,22 @@ public class GameManager extends JavaPlugin implements Listener {
 		// 視線の先にあるブロック一覧を取得する
 		BlockIterator it = new BlockIterator(player, range);
 
-		while ( it.hasNext() ) {
+		while (it.hasNext()) {
 			Block block = it.next();
 
-			if ( block.getType() != Material.AIR ) {
+			if (block.getType() != Material.AIR) {
 				// ブロックが見つかった(遮られている)、処理を終わってnullを返す
 				return null;
 
 			} else {
 				// 位置が一致するPlayerがないか探す
-				for ( Player target : Bukkit.getOnlinePlayers() ) {
-					if(target == player
-							||target.getGameMode() == GameMode.SPECTATOR){
+				for (Player target : Bukkit.getOnlinePlayers()) {
+					if (target == player
+							|| target.getGameMode() == GameMode.SPECTATOR) {
 						continue;
 					}
-					if ( block.getLocation().distanceSquared(target.getLocation()) <= 3.0
-							|| block.getLocation().distanceSquared(target.getEyeLocation()) <= 3.0){
+					if (block.getLocation().distanceSquared(target.getLocation()) <= 3.0
+							|| block.getLocation().distanceSquared(target.getEyeLocation()) <= 3.0) {
 						// 見つかったPlayerを返す
 						return target;
 					}
@@ -241,62 +251,64 @@ public class GameManager extends JavaPlugin implements Listener {
 		return null;
 	}
 
+	public void gameover(Player winner, boolean sixstar) {
 
-	public void gameover(Player winner, boolean sixstar){
-
-		if((boolean)config.get("Timer"))
+		if ((boolean) config.get("Timer")) {
 			Timer.TimerTaskID.cancel();
+		}
 		GameManager.isStart = false;
 
 		FileConfiguration config = this.getConfig();
 		int star = 0;
-		if(winner == null){
-			for(Player p : Bukkit.getOnlinePlayers()){
-				p.sendMessage(header+ChatColor.RED+"時間切れにより勝者が決定しました");
-				if(p.getGameMode() == GameMode.SPECTATOR)
+		if (winner == null) {
+			for (Player p : Bukkit.getOnlinePlayers()) {
+				p.sendMessage(header + ChatColor.RED + "時間切れにより勝者が決定しました");
+				if (p.getGameMode() == GameMode.SPECTATOR) {
 					continue;
-				if(winner == null){
+				}
+				if (winner == null) {
 					winner = p;
 					//	continue;
 				}
-				for(ItemStack item : p.getInventory().getContents()){
-					if(item != null && item.getType() == Material.NETHER_STAR && item.getAmount() > star){
+				for (ItemStack item : p.getInventory().getContents()) {
+					if (item != null && item.getType() == Material.NETHER_STAR && item.getAmount() > star) {
 						winner = p;
 						star = item.getAmount();
 					}
 				}
-				p.teleport((Location) config.get("LobbyLocation"), TeleportCause.ENDER_PEARL);
-				TitleSender.sendTitle(p, ChatColor.DARK_RED+"勝者:"+ChatColor.DARK_GREEN+winner.getName(), ChatColor.YELLOW+"獲得クリスタル数："+star+"個");
-				p.playSound(p.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+				p.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), TeleportCause.ENDER_PEARL);
+				TitleSender.sendTitle(p, ChatColor.DARK_RED + "勝者:" + ChatColor.DARK_GREEN + winner.getName(),
+						ChatColor.YELLOW + "獲得クリスタル数：" + star + "個");
+				p.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 1F, 1F);
 
 				p.getInventory().clear();
 
 				p.setGameMode(GameMode.SURVIVAL);
 			}
-		}
-		else if(sixstar){
-			for(Player p : Bukkit.getOnlinePlayers()){
-				for(ItemStack item : winner.getInventory().getContents()){
-					if(item != null && item.getType() == Material.COMPASS){
+		} else if (sixstar) {
+			for (Player p : Bukkit.getOnlinePlayers()) {
+				for (ItemStack item : winner.getInventory().getContents()) {
+					if (item != null && item.getType() == Material.COMPASS) {
 						star = item.getAmount();
 					}
 				}
-				for(Player all : Bukkit.getOnlinePlayers()){
-					all.sendMessage(header+ChatColor.RED+winner.getName()+"さんがクリスタルを6個以上集めました");
-					all.teleport((Location) config.get("LobbyLocation"), TeleportCause.ENDER_PEARL);
-					TitleSender.sendTitle(all, ChatColor.DARK_RED+"勝者:"+ChatColor.DARK_GREEN+winner.getName(), ChatColor.YELLOW+"獲得クリスタル数："+star+"個");
-					all.playSound(p.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+				for (Player all : Bukkit.getOnlinePlayers()) {
+					all.sendMessage(header + ChatColor.RED + winner.getName() + "さんがクリスタルを6個以上集めました");
+					all.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), TeleportCause.ENDER_PEARL);
+					TitleSender.sendTitle(all, ChatColor.DARK_RED + "勝者:" + ChatColor.DARK_GREEN + winner.getName(),
+							ChatColor.YELLOW + "獲得クリスタル数：" + star + "個");
+					all.playSound(p.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 1F, 1F);
 					all.getInventory().clear();
 					all.setGameMode(GameMode.SURVIVAL);
 				}
 			}
-		}
-		else{
-			for(Player all : Bukkit.getOnlinePlayers()){
-				all.sendMessage(header+ChatColor.RED+winner.getName()+"さんが最後の生存者です");
-				all.teleport((Location) config.get("LobbyLocation"), TeleportCause.ENDER_PEARL);
-				TitleSender.sendTitle(all, ChatColor.DARK_RED+"勝者:"+ChatColor.DARK_GREEN+winner.getName(), ChatColor.YELLOW+"獲得クリスタル数："+star+"個");
-				all.playSound(all.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+		} else {
+			for (Player all : Bukkit.getOnlinePlayers()) {
+				all.sendMessage(header + ChatColor.RED + winner.getName() + "さんが最後の生存者です");
+				all.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), TeleportCause.ENDER_PEARL);
+				TitleSender.sendTitle(all, ChatColor.DARK_RED + "勝者:" + ChatColor.DARK_GREEN + winner.getName(),
+						ChatColor.YELLOW + "獲得クリスタル数：" + star + "個");
+				all.playSound(all.getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 1F, 1F);
 				all.getInventory().clear();
 
 				all.setGameMode(GameMode.SURVIVAL);
@@ -304,19 +316,18 @@ public class GameManager extends JavaPlugin implements Listener {
 
 		}
 
-		for(Entity entity : Bukkit.getWorlds().get(0).getEntities()){
-			if(entity instanceof Player){
-				if(((Player)entity).getGameMode() != GameMode.CREATIVE){
-					((Player)entity).getInventory().clear();
+		for (Entity entity : Bukkit.getWorlds().get(0).getEntities()) {
+			if (entity instanceof Player) {
+				if (((Player) entity).getGameMode() != GameMode.CREATIVE) {
+					((Player) entity).getInventory().clear();
 					entity.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
-					((Player)entity).setGameMode(GameMode.SURVIVAL);
+					((Player) entity).setGameMode(GameMode.SURVIVAL);
 				}
-				canThrow.put((Player)entity, false);
-				canBuy.put((Player)entity, false);
-				((Player)entity).removePotionEffect(PotionEffectType.INVISIBILITY);
+				canThrow.put((Player) entity, false);
+				canBuy.put((Player) entity, false);
+				((Player) entity).removePotionEffect(PotionEffectType.INVISIBILITY);
 
-			}
-			else if(entity instanceof Item){
+			} else if (entity instanceof Item) {
 				entity.remove();
 			}
 		}

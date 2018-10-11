@@ -12,67 +12,82 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Commands implements CommandExecutor {
 	public static GameManager GameManager;
-	Commands(GameManager instance){
+
+	Commands(GameManager instance) {
 		this.GameManager = instance;
 	}
 
-	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args)
-	{
+	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		FileConfiguration config = GameManager.getConfig();
 
-		if(cmd.getName().equalsIgnoreCase("start"))
-		{
-			if(config.get("LobbyLocation") == null){
-				sender.sendMessage(GameManager.header+"LobbyLocationが設定されていません。");
-				sender.sendMessage(GameManager.header+"座標に立ち、/set LobbyLocation で設定できます");
-			}
-			else{
-					GameManager.start();
+		if (cmd.getName().equalsIgnoreCase("start")) {
+			if (config.get("CenterLocation") == null) {
+				sender.sendMessage(GameManager.header + "CenterLocationが設定されていません。");
+				sender.sendMessage(GameManager.header + "座標に立ち、/set CenterLocation で設定できます");
+			} else if (config.get("WorldRange") == null) {
+				sender.sendMessage(GameManager.header + "WorldRangeが設定されていません。");
+				sender.sendMessage(GameManager.header + "/set WorldRange <範囲> で設定できます");
+			} else {
+				GameManager.start();
 			}
 			return true;
 		}
 
-		if(cmd.getName().equalsIgnoreCase("set"))
-		{
-			if(args.length == 0)
+		if (cmd.getName().equalsIgnoreCase("set")) {
+			if (args.length == 0)
 				return false;
 
-			Location loc = ((Player)sender).getLocation().clone();
-			loc.setPitch(0);
+			if (args[0].equalsIgnoreCase("CenterLocation")) {
+				Location loc = ((Player) sender).getLocation().clone();
+				loc.setPitch(0);
 
-			config.set(args[0], loc);
-			GameManager.saveConfig();
-			sender.sendMessage(args[0]+"を設定しました");
+				config.set("CenterLocation", loc);
+				GameManager.saveConfig();
+				sender.sendMessage("CenterLocationを設定しました");
 
-			return true;
-		}
-		if(cmd.getName().equalsIgnoreCase("spawn")){
-			if((GameManager.board.getPlayerTeam((Player)sender)) == null){
-				sender.sendMessage(GameManager.header+ChatColor.RED+"準備時間中のみ使用可能です");
+				return true;
+			} else if (args[0].equalsIgnoreCase("WorldRange")) {
+				if (args.length < 2) {
+					return false;
+				}
+
+				config.set("WorldRange", args[1]);
+				GameManager.saveConfig();
+				sender.sendMessage("WorldRangeを設定しました");
+
 				return true;
 			}
-			if(GameManager.isStart){
-				sender.sendMessage(GameManager.header+ChatColor.RED+"準備時間中のみ使用可能です");
+
+			return false;
+		}
+		if (cmd.getName().equalsIgnoreCase("spawn")) {
+			if ((GameManager.board.getPlayerTeam((Player) sender)) == null) {
+				sender.sendMessage(GameManager.header + ChatColor.RED + "準備時間中のみ使用可能です");
 				return true;
 			}
-			((Player)sender).teleport(GameManager.respawn());
-			sender.sendMessage(GameManager.header+ChatColor.RED+"リスポーンしました");
+			if (GameManager.isStart) {
+				sender.sendMessage(GameManager.header + ChatColor.RED + "準備時間中のみ使用可能です");
+				return true;
+			}
+			((Player) sender).teleport(GameManager.respawn());
+			sender.sendMessage(GameManager.header + ChatColor.RED + "リスポーンしました");
 			return true;
 		}
-		if(cmd.getName().equalsIgnoreCase("s")
-				||cmd.getName().equalsIgnoreCase("shop")){
-			if(((Player)sender).getGameMode() == GameMode.SPECTATOR)
-				sender.sendMessage(GameManager.header+ChatColor.GRAY+"観戦者は購入できません");
+		if (cmd.getName().equalsIgnoreCase("s") || cmd.getName().equalsIgnoreCase("shop")) {
+			if (((Player) sender).getGameMode() == GameMode.SPECTATOR) {
+				sender.sendMessage(GameManager.header + ChatColor.GRAY + "観戦者は購入できません");
+			}
 
-			if(GameManager.isStart)
-				((Player)sender).openInventory(GameManager.Items.BuyBimInventory);
-			else
-				sender.sendMessage(GameManager.header+ChatColor.GRAY+"試合中のみ使用できます");
+			if (GameManager.isStart || sender.isOp()) {
+				((Player) sender).openInventory(GameManager.Items.BuyBimInventory);
+			} else {
+				sender.sendMessage(GameManager.header + ChatColor.GRAY + "試合中のみ使用できます");
+			}
 
 			return true;
 		}
 
-		if(cmd.getName().equalsIgnoreCase("debug")){
+		if (cmd.getName().equalsIgnoreCase("debug")) {
 			GameManager.gameover(null, false);
 			return true;
 		}

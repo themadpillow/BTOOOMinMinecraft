@@ -17,9 +17,9 @@ public class TitleSender {
 	// class取得用の変数
 	private String netMinecraftserver = "net.minecraft.server.";
 
-	private Object enumTitle,enumSubtitle,enumTime;
-	private Constructor<?> constructorTitle,constructorTime;
-	private Method methodTitle,methodHandle,methodSendpacket;
+	private Object enumTitle, enumSubtitle, enumTime;
+	private Constructor<?> constructorTitle, constructorTime;
+	private Method methodTitle, methodHandle, methodSendpacket;
 	private Field fieldConnection;
 
 	/**
@@ -30,7 +30,7 @@ public class TitleSender {
 		try {
 			// 一時的に使用する変数です、Bukkitのバージョンを取得しています。
 			String tmp_package[] = Bukkit.getServer().getClass().getPackage().getName().split("\\.");
-			String tmp_version = tmp_package[tmp_package.length-1]+".";
+			String tmp_version = tmp_package[tmp_package.length - 1] + ".";
 
 			// サーババージョンの取得&結合
 			netMinecraftserver += tmp_version;
@@ -44,18 +44,21 @@ public class TitleSender {
 			enumTitle = tmp_packetPlayout.getDeclaredClasses()[0].getField("TITLE").get(null);
 			enumSubtitle = tmp_packetPlayout.getDeclaredClasses()[0].getField("SUBTITLE").get(null);
 			methodTitle = tmp_ichatBase.getDeclaredClasses()[0].getMethod("a", String.class);
-			constructorTitle = tmp_packetPlayout.getConstructor(tmp_packetPlayout.getDeclaredClasses()[0], tmp_ichatBase);
-			constructorTime = tmp_packetPlayout.getConstructor(tmp_packetPlayoutEnumtitle,tmp_ichatBase, int.class, int.class, int.class);
+			constructorTitle = tmp_packetPlayout.getConstructor(tmp_packetPlayout.getDeclaredClasses()[0],
+					tmp_ichatBase);
+			constructorTime = tmp_packetPlayout.getConstructor(tmp_packetPlayoutEnumtitle, tmp_ichatBase, int.class,
+					int.class, int.class);
 			enumTime = tmp_packetPlayoutEnumtitle.getEnumConstants()[2];
 
 			try {
-				methodHandle = Class.forName("org.bukkit.craftbukkit."+tmp_version+"entity.CraftPlayer").getMethod("getHandle");
+				methodHandle = Class.forName("org.bukkit.craftbukkit." + tmp_version + "entity.CraftPlayer")
+						.getMethod("getHandle");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			fieldConnection = getNMSClass("EntityPlayer").getField("playerConnection");
 			methodSendpacket = getNMSClass("PlayerConnection").getMethod("sendPacket", getNMSClass("Packet"));
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -65,7 +68,7 @@ public class TitleSender {
 	 * @param player
 	 */
 	public void resetTitle(Player player) {
-		sendTitle(player,"","");
+		sendTitle(player, "", "");
 	}
 
 	/**
@@ -82,10 +85,7 @@ public class TitleSender {
 						constructorTitle.newInstance(
 								enumTitle,
 								methodTitle.invoke(null,
-										"{\"text\":\"" + title + "\"}"
-										)
-								)
-						);
+										"{\"text\":\"" + title + "\"}")));
 			}
 
 			if (subtitle != null) {
@@ -95,16 +95,12 @@ public class TitleSender {
 								enumSubtitle,
 								methodTitle.invoke(
 										null,
-										"{\"text\":\"" + subtitle + "\"}"
-										)
-								)
-						);
+										"{\"text\":\"" + subtitle + "\"}")));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
 
 	/**
 	 * タイトルを表示する時間を設定します(単位::second)
@@ -116,10 +112,9 @@ public class TitleSender {
 	public void setTime_second(Player player, double feedIn, double titleShow, double feedOut) {
 		setTime_tick(
 				player,
-				(int)(feedIn * 20),
-				(int)(titleShow * 20),
-				(int)(feedOut * 20)
-				);
+				(int) (feedIn * 20),
+				(int) (titleShow * 20),
+				(int) (feedOut * 20));
 	}
 
 	/**
@@ -134,8 +129,7 @@ public class TitleSender {
 				player,
 				feedIn * 20,
 				titleShow * 20,
-				feedOut * 20
-				);
+				feedOut * 20);
 	}
 
 	/**
@@ -154,9 +148,7 @@ public class TitleSender {
 							null,
 							feedIn,
 							titleShow,
-							feedOut
-							)
-					);
+							feedOut));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -172,10 +164,8 @@ public class TitleSender {
 			// パケットの送信
 			methodSendpacket.invoke(
 					fieldConnection.get(
-							methodHandle.invoke(player)
-							),
-					packet
-					);
+							methodHandle.invoke(player)),
+					packet);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -188,7 +178,7 @@ public class TitleSender {
 	 */
 	private Class<?> getNMSClass(String name) {
 		try {
-			return Class.forName(netMinecraftserver+ name);
+			return Class.forName(netMinecraftserver + name);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

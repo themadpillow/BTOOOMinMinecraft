@@ -19,138 +19,149 @@ public class FlameBim {
 	Item bim = null;
 	int x = 0, y = 0, z = 0;
 
-	public void Throw(Player p){
-		if(p.getInventory().getItemInHand().getAmount() == 1)
+	public void Throw(Player p) {
+		if (p.getInventory().getItemInHand().getAmount() == 1) {
 			p.getInventory().clear(p.getInventory().getHeldItemSlot());
-		else
+		} else {
 			p.getInventory().getItemInHand().setAmount(p.getInventory().getItemInHand().getAmount() - 1);
+		}
 
 		bim = Bukkit.getWorlds().get(0).dropItem(p.getEyeLocation(), new ItemStack(Material.FIREBALL));
 		bim.setMetadata("nopickup", new FixedMetadataValue(GameManager, true));
-		if(p.isSneaking())
+		if (p.isSneaking()) {
 			bim.setVelocity(p.getLocation().getDirection().multiply(0.7));
-		else if(p.isSprinting())
+		} else if (p.isSprinting()) {
 			bim.setVelocity(p.getLocation().getDirection().multiply(1.5));
-		else
+		} else {
 			bim.setVelocity(p.getLocation().getDirection());
+		}
 
-		new BukkitRunnable(){public void run(){
-			if(bim.isOnGround()){
-				Location loc = bim.getLocation();
-				if(loc.getBlock().getType() == Material.AIR){
-					fire(loc);
+		new BukkitRunnable() {
+			public void run() {
+				if (bim.isOnGround()) {
+					Location loc = bim.getLocation();
+					if (loc.getBlock().getType() == Material.AIR) {
+						fire(loc);
+					}
+					{
+						for (int x = -1; x < 2; x += 2) {
+							for (int z = -1; z < 2; z += 2) {
+								if (loc.clone().add(x, 0, z).getBlock().getType() == Material.AIR) {
+									fire(loc.clone().add(x, 0, z));
+								} else if (loc.clone().add(x, -1, z).getBlock().getType() == Material.AIR) {
+									fire(loc.clone().add(x, -1, z));
+								} else if (loc.clone().add(x, 1, z).getBlock().getType() == Material.AIR) {
+									fire(loc.clone().add(x, 1, z));
+								}
+							}
+						}
+					}
+					Bukkit.getWorlds().get(0).playSound(loc, Sound.BLOCK_FIRE_AMBIENT, 0.5F, 1);
+					new BukkitRunnable() {
+						public void run() {
+							x++;
+							if (x > 4) {
+								this.cancel();
+							}
+							if (loc.clone().add(x, 0, 0).getBlock().getType() == Material.AIR) {
+								for (y = -1; -y < x + 1; y--) {
+									if (loc.clone().add(x, y, 0).getBlock().getType() != Material.AIR) {
+										break;
+									}
+								}
+								fire(loc.clone().add(x, y + 1, 0));
+								Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.BLOCK_FIRE_AMBIENT,
+										1 / x * 0.2F, 1);
+							} else {
+								for (y = 1; y < x + 1; y++) {
+									if (loc.clone().add(x, y, 0).getBlock().getType() == Material.AIR) {
+										break;
+									}
+								}
+								fire(loc.clone().add(x, y, 0));
+								Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.BLOCK_FIRE_AMBIENT,
+										1 / x * 0.2F, 1);
+							}
+							if (loc.clone().add(-x, 0, 0).getBlock().getType() == Material.AIR) {
+								for (y = -1; -y < x + 1; y--) {
+									if (loc.clone().add(-x, y, 0).getBlock().getType() != Material.AIR) {
+										break;
+									}
+								}
+								fire(loc.clone().add(-x, y + 1, 0));
+								Bukkit.getWorlds().get(0).playSound(loc.clone().add(-x, y, 0), Sound.BLOCK_FIRE_AMBIENT,
+										1 / x * 0.2F, 1);
+							} else {
+								for (y = 1; y < x + 1; y++) {
+									if (loc.clone().add(-x, y, 0).getBlock().getType() == Material.AIR) {
+										break;
+									}
+								}
+								fire(loc.clone().add(-x, y, 0));
+								Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.BLOCK_FIRE_AMBIENT,
+										1 / x * 0.2F, 1);
+							}
+
+							z++;
+							if (z > 4) {
+								this.cancel();
+							}
+							if (loc.clone().add(0, 0, z).getBlock().getType() == Material.AIR) {
+								for (y = -1; -y < z + 1; y--) {
+									if (loc.clone().add(0, y, z).getBlock().getType() != Material.AIR) {
+										break;
+									}
+								}
+								fire(loc.clone().add(0, y + 1, z));
+								Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, z), Sound.BLOCK_FIRE_AMBIENT,
+										1 / x * 0.2F, 1);
+							} else {
+								for (y = 1; y < z + 1; y++) {
+									if (loc.clone().add(0, y, z).getBlock().getType() == Material.AIR) {
+										break;
+									}
+								}
+								fire(loc.clone().add(0, y, z));
+								Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, z), Sound.BLOCK_FIRE_AMBIENT,
+										1 / x * 0.2F, 1);
+							}
+							if (loc.clone().add(0, 0, -z).getBlock().getType() == Material.AIR) {
+								for (y = -1; -y < z + 1; y--) {
+									if (loc.clone().add(0, y, -z).getBlock().getType() != Material.AIR) {
+										break;
+									}
+								}
+								fire(loc.clone().add(0, y + 1, -z));
+								Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, -z), Sound.BLOCK_FIRE_AMBIENT,
+										1 / x * 0.2F, 1);
+							} else {
+								for (y = 1; y < z + 1; y++) {
+									if (loc.clone().add(0, y, -z).getBlock().getType() == Material.AIR) {
+										break;
+									}
+								}
+								fire(loc.clone().add(0, y, -z));
+								Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, -z), Sound.BLOCK_FIRE_AMBIENT,
+										1 / x * 0.2F, 1);
+							}
+						}
+					}.runTaskTimer(GameManager, 0L, x * 15L);
+					bim.remove();
+
+					this.cancel();
 				}
-				{
-					for(int x = -1; x < 2; x += 2){
-						for(int z = -1; z < 2; z += 2){
-							if(loc.clone().add(x,0,z).getBlock().getType() == Material.AIR){
-								fire(loc.clone().add(x,0,z));
-							}
-							else if(loc.clone().add(x,-1,z).getBlock().getType() == Material.AIR){
-								fire(loc.clone().add(x,-1,z));
-							}
-							else if(loc.clone().add(x,1,z).getBlock().getType() == Material.AIR){
-								fire(loc.clone().add(x,1,z));
-							}
-						}
-					}
-				}
-				Bukkit.getWorlds().get(0).playSound(loc, Sound.FIZZ, 0.5F, 1);
-				new BukkitRunnable(){public void run(){
-					x ++;
-					if(x > 4)
-						this.cancel();
-					if(loc.clone().add(x, 0, 0).getBlock().getType() == Material.AIR){
-						for(y = -1; -y < x+1; y --){
-							if(loc.clone().add(x, y, 0).getBlock().getType() != Material.AIR){
-								break;
-							}
-						}
-						fire(loc.clone().add(x, y+1, 0));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.FIZZ, 1/x*0.2F, 1);
-					}
-					else{
-						for(y = 1; y < x+1; y ++){
-							if(loc.clone().add(x, y, 0).getBlock().getType() == Material.AIR){
-								break;
-							}
-						}
-						fire(loc.clone().add(x, y, 0));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.FIZZ, 1/x*0.2F, 1);
-					}
-					if(loc.clone().add(-x, 0, 0).getBlock().getType() == Material.AIR){
-						for(y = -1; -y < x+1; y --){
-							if(loc.clone().add(-x, y, 0).getBlock().getType() != Material.AIR){
-								break;
-							}
-						}
-						fire(loc.clone().add(-x, y+1, 0));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(-x, y, 0), Sound.FIZZ, 1/x*0.2F, 1);
-					}
-					else{
-						for(y = 1; y < x+1; y ++){
-							if(loc.clone().add(-x, y, 0).getBlock().getType() == Material.AIR){
-								break;
-							}
-						}
-						fire(loc.clone().add(-x, y, 0));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(x, y, 0), Sound.FIZZ, 1/x*0.2F, 1);
-					}
-
-					z ++;
-					if(z > 4)
-						this.cancel();
-					if(loc.clone().add(0, 0, z).getBlock().getType() == Material.AIR){
-						for(y = -1; -y < z+1; y --){
-							if(loc.clone().add(0, y, z).getBlock().getType() != Material.AIR){
-								break;
-							}
-						}
-						fire(loc.clone().add(0, y+1, z));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, z), Sound.FIZZ, 1/x*0.2F, 1);
-					}
-					else{
-						for(y = 1; y < z+1; y ++){
-							if(loc.clone().add(0, y, z).getBlock().getType() == Material.AIR){
-								break;
-							}
-						}
-						fire(loc.clone().add(0, y, z));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, z), Sound.FIZZ, 1/x*0.2F, 1);
-					}
-					if(loc.clone().add(0, 0, -z).getBlock().getType() == Material.AIR){
-						for(y = -1; -y < z+1; y --){
-							if(loc.clone().add(0, y, -z).getBlock().getType() != Material.AIR){
-								break;
-							}
-						}
-						fire(loc.clone().add(0, y+1, -z));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, -z), Sound.FIZZ, 1/x*0.2F, 1);
-					}
-					else{
-						for(y = 1; y < z+1; y ++){
-							if(loc.clone().add(0, y, -z).getBlock().getType() == Material.AIR){
-								break;
-							}
-						}
-						fire(loc.clone().add(0, y, -z));
-						Bukkit.getWorlds().get(0).playSound(loc.clone().add(0, y, -z), Sound.FIZZ, 1/x*0.2F, 1);
-					}
-				}}.runTaskTimer(GameManager, 0L, x*15L);
-				bim.remove();
-
-				this.cancel();
 			}
-		}}.runTaskTimer(GameManager, 0L, 5L);
+		}.runTaskTimer(GameManager, 0L, 5L);
 	}
 
-
-	public void fire(Location loc){
-		if(loc.getBlock().getType() == Material.AIR){
+	public void fire(Location loc) {
+		if (loc.getBlock().getType() == Material.AIR) {
 			loc.getBlock().setType(Material.FIRE);
-			new BukkitRunnable(){public void run(){
-				loc.getBlock().setType(Material.AIR);
-			}}.runTaskLater(GameManager, 100L);
+			new BukkitRunnable() {
+				public void run() {
+					loc.getBlock().setType(Material.AIR);
+				}
+			}.runTaskLater(GameManager, 100L);
 		}
 	}
 }
