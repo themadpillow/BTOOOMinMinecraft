@@ -1,0 +1,17 @@
+ThrowRange:
+  default: 1.0
+  run: 1.5
+  shift: 0.7
+Bims:
+  TimerBim:
+      damage: 2.0
+  CrackerBim:
+      damage: 1.4
+  FlameBim:
+      damage: -1
+  HomingBim:
+      damage: 1.4
+      speed: 2.0
+  InstallationBim:
+      damage: 2.5
+      range: 2.0
