@@ -1,4 +1,4 @@
-package Bims;
+package bims;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -39,11 +39,16 @@ public class InstallationBim {
 					return;
 				}
 				Location loc = bim.getLocation();
-				for (Entity e : Bukkit.getWorlds().get(0).getNearbyEntities(loc, 2F, 2F, 2F)) {
+				for (Entity e : Bukkit.getWorlds().get(0).getNearbyEntities(
+						loc,
+						BimConfig.getInstallationRange(),
+						BimConfig.getInstallationRange(),
+						BimConfig.getInstallationRange())) {
 					if ((e instanceof Player && ((Player) e).getGameMode() == GameMode.SPECTATOR)
 							|| e == p)
 						continue;
-					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(), 2.5F, false, false);
+					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(),
+							BimConfig.getDamage(Bims.InstallationBim), false, false);
 					bim.setType(Material.AIR);
 					bim = null;
 					this.cancel();

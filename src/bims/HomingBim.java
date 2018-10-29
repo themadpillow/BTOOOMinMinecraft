@@ -1,4 +1,4 @@
-package Bims;
+package bims;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
@@ -23,7 +23,8 @@ public class HomingBim {
 
 		//bim = p.launchProjectile(Snowball.class);
 		bim = (Snowball) Bukkit.getWorlds().get(0).spawnEntity(
-				p.getEyeLocation().add(p.getEyeLocation().getDirection().multiply(2)), EntityType.SNOWBALL);
+				p.getEyeLocation().add(p.getEyeLocation().getDirection().multiply(BimConfig.getHomingSpeed())),
+				EntityType.SNOWBALL);
 
 		bim.setMetadata("type", new FixedMetadataValue(GameManager, "homing"));
 		new BukkitRunnable() {
@@ -36,7 +37,7 @@ public class HomingBim {
 						.multiply(-0.3F / bim.getLocation().subtract(target.getEyeLocation()).toVector().length()));
 				if (bim.getLocation().subtract(target.getEyeLocation()).toVector().length() < 1.5) {
 					Bukkit.getWorlds().get(0).createExplosion(bim.getLocation().getX(), bim.getLocation().getY(),
-							bim.getLocation().getZ(), 1.4F, false, false);
+							bim.getLocation().getZ(), BimConfig.getDamage(Bims.HomingBim), false, false);
 					bim.remove();
 					bim = null;
 					this.cancel();

@@ -1,4 +1,4 @@
-package Bims;
+package bims;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -29,11 +29,11 @@ public class FlameBim {
 		bim = Bukkit.getWorlds().get(0).dropItem(p.getEyeLocation(), new ItemStack(Material.FIREBALL));
 		bim.setMetadata("nopickup", new FixedMetadataValue(GameManager, true));
 		if (p.isSneaking()) {
-			bim.setVelocity(p.getLocation().getDirection().multiply(0.7));
+			bim.setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Shift)));
 		} else if (p.isSprinting()) {
-			bim.setVelocity(p.getLocation().getDirection().multiply(1.5));
+			bim.setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Run)));
 		} else {
-			bim.setVelocity(p.getLocation().getDirection());
+			bim.setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Default)));
 		}
 
 		new BukkitRunnable() {

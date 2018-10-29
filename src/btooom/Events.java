@@ -31,11 +31,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.connorlinfoot.actionbarapi.ActionBarAPI;
 
-import Bims.CrackerBim;
-import Bims.FlameBim;
-import Bims.HomingBim;
-import Bims.InstallationBim;
-import Bims.TimerBim;
+import bims.BimConfig;
+import bims.Bims;
+import bims.CrackerBim;
+import bims.FlameBim;
+import bims.HomingBim;
+import bims.InstallationBim;
+import bims.TimerBim;
 import net.md_5.bungee.api.ChatColor;
 
 public class Events implements Listener {
@@ -179,7 +181,8 @@ public class Events implements Listener {
 				switch (e.getEntity().getMetadata("type").get(0).asString()) {
 				case "crack":
 					Bukkit.getWorlds().get(0).createExplosion(e.getEntity().getLocation().getX(),
-							e.getEntity().getLocation().getY(), e.getEntity().getLocation().getZ(), 1.4F, false, false);
+							e.getEntity().getLocation().getY(), e.getEntity().getLocation().getZ(),
+							BimConfig.getDamage(Bims.CrackerBim), false, false);
 					break;
 				default:
 					return;
@@ -190,16 +193,18 @@ public class Events implements Listener {
 	}
 
 	@EventHandler
-	public void hitCrackororHoming(ProjectileHitEvent e) {
+	public void hitororHoming(ProjectileHitEvent e) {
 		if (e.getEntity() instanceof Snowball) {
 			if (e.getEntity().getMetadata("type") != null) {
 				Location loc = e.getEntity().getLocation();
 				switch (e.getEntity().getMetadata("type").get(0).asString()) {
 				case "crack":
-					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(), 1.4F, false, false);
+					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(),
+							BimConfig.getDamage(Bims.CrackerBim), false, false);
 					break;
 				case "homing":
-					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(), 1.4F, false, false);
+					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(),
+							BimConfig.getDamage(Bims.HomingBim), false, false);
 					break;
 				default:
 					return;

@@ -1,5 +1,9 @@
 package btooom;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,11 +35,13 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BlockIterator;
 
-import Bims.CrackerBim;
-import Bims.FlameBim;
-import Bims.HomingBim;
-import Bims.InstallationBim;
-import Bims.TimerBim;
+import bims.BimConfig;
+import bims.CrackerBim;
+import bims.FlameBim;
+import bims.HomingBim;
+import bims.InstallationBim;
+import bims.TimerBim;
+import other.CustomConfig;
 import other.TitleSender;
 
 public class GameManager extends JavaPlugin implements Listener {
@@ -60,9 +66,11 @@ public class GameManager extends JavaPlugin implements Listener {
 
 	public final String header = ChatColor.GREEN + "§l[BTOOOM] ";
 
-	FileConfiguration config = this.getConfig();
+	FileConfiguration config;
 
 	public void onEnable() {
+		config = this.getConfig();
+
 		TimerBim TimerBim = new TimerBim();
 		TimerBim.GameManager = this;
 		CrackerBim CrackerBim = new CrackerBim();
@@ -126,6 +134,8 @@ public class GameManager extends JavaPlugin implements Listener {
 
 			}
 		}
+
+		bimDamageConfigCheck();
 	}
 
 	public void onDisable() {
@@ -135,6 +145,36 @@ public class GameManager extends JavaPlugin implements Listener {
 		if (team != null) {
 			team.unregister();
 		}
+	}
+
+	private void bimDamageConfigCheck() {
+		File bimconfigFile = new File(this.getDataFolder().getPath() + "\\bimConfig.yml");
+		if (!bimconfigFile.exists()) {
+			InputStream fis = getClass().getResourceAsStream("/bimConfig.yml");
+			FileOutputStream fos = null;
+			try {
+				fos = new FileOutputStream(bimconfigFile);
+
+				byte[] buf = new byte[1024];
+				int i = 0;
+				while ((i = fis.read(buf)) != -1) {
+					fos.write(buf, 0, i);
+				}
+			} catch (IOException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			} finally {
+				try {
+					fis.close();
+					fos.close();
+				} catch (IOException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			}
+		}
+
+		BimConfig damageConfig = new BimConfig(new CustomConfig(this, "bimConfig.yml"));
 	}
 
 	public void start() {

@@ -1,4 +1,4 @@
-package Bims;
+package bims;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -55,7 +55,7 @@ public class TimerBim {
 					} else {
 						bim.remove();
 						Bukkit.getWorlds().get(0).createExplosion(bim.getLocation().getX(), bim.getLocation().getY(),
-								bim.getLocation().getZ(), 2F, false, false);
+								bim.getLocation().getZ(), BimConfig.getDamage(Bims.TimerBim), false, false);
 						bim = null;
 					}
 				}
@@ -73,11 +73,11 @@ public class TimerBim {
 		bim = Bukkit.getWorlds().get(0).dropItem(p.getEyeLocation(), new ItemStack(Material.COAL));
 		bim.setMetadata("nopickup", new FixedMetadataValue(GameManager, true));
 		if (p.isSneaking()) {
-			bim.setVelocity(p.getLocation().getDirection().multiply(0.7));
+			bim.setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Shift)));
 		} else if (p.isSprinting()) {
-			bim.setVelocity(p.getLocation().getDirection().multiply(1.5));
+			bim.setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Run)));
 		} else {
-			bim.setVelocity(p.getLocation().getDirection());
+			bim.setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Default)));
 		}
 		if (timer == 5) {
 			count(p);
