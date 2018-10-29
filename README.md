@@ -4,4 +4,8 @@ Dependence:
   ActionBarAPI  
   
 Commands:  
-  /set LobbyLocation
+  /set [CenterLocation or WorldRange]  
+  /start  
+  /spawn  
+  /shop or /s  
+  /debug  
