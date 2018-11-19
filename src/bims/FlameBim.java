@@ -43,16 +43,14 @@ public class FlameBim {
 					if (loc.getBlock().getType() == Material.AIR) {
 						fire(loc);
 					}
-					{
-						for (int x = -1; x < 2; x += 2) {
-							for (int z = -1; z < 2; z += 2) {
-								if (loc.clone().add(x, 0, z).getBlock().getType() == Material.AIR) {
-									fire(loc.clone().add(x, 0, z));
-								} else if (loc.clone().add(x, -1, z).getBlock().getType() == Material.AIR) {
-									fire(loc.clone().add(x, -1, z));
-								} else if (loc.clone().add(x, 1, z).getBlock().getType() == Material.AIR) {
-									fire(loc.clone().add(x, 1, z));
-								}
+					for (int x = -1; x < 2; x += 2) {
+						for (int z = -1; z < 2; z += 2) {
+							if (loc.clone().add(x, 0, z).getBlock().getType() == Material.AIR) {
+								fire(loc.clone().add(x, 0, z));
+							} else if (loc.clone().add(x, -1, z).getBlock().getType() == Material.AIR) {
+								fire(loc.clone().add(x, -1, z));
+							} else if (loc.clone().add(x, 1, z).getBlock().getType() == Material.AIR) {
+								fire(loc.clone().add(x, 1, z));
 							}
 						}
 					}
@@ -157,11 +155,9 @@ public class FlameBim {
 	public void fire(Location loc) {
 		if (loc.getBlock().getType() == Material.AIR) {
 			loc.getBlock().setType(Material.FIRE);
-			new BukkitRunnable() {
-				public void run() {
-					loc.getBlock().setType(Material.AIR);
-				}
-			}.runTaskLater(GameManager, 100L);
+			Bukkit.getScheduler().runTaskLater(GameManager, () -> {
+				loc.getBlock().setType(Material.AIR);
+			}, 100L);
 		}
 	}
 }

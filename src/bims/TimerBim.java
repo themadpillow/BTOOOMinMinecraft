@@ -46,11 +46,9 @@ public class TimerBim {
 					GameManager.HandTimerBim.put(p, null);
 					if (bim == null) {
 						p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, (byte) 4);
-						new BukkitRunnable() {
-							public void run() {
-								p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, (byte) 4);
-							}
-						}.runTaskLater(GameManager, 1L);
+						Bukkit.getScheduler().runTaskLater(GameManager, () -> {
+							p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, (byte) 4);
+						}, 1L);
 						return;
 					} else {
 						bim.remove();

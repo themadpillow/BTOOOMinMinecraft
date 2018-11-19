@@ -42,13 +42,14 @@ import bims.HomingBim;
 import bims.InstallationBim;
 import bims.TimerBim;
 import other.CustomConfig;
+import other.Timer;
 import other.TitleSender;
 
 public class GameManager extends JavaPlugin implements Listener {
-
 	Items Items = new Items();
-	other.Timer Timer = new other.Timer(this);
-	TitleSender TitleSender = new TitleSender();
+	Timer Timer = new Timer(this);
+	TitleSender TitleSender;
+	FileConfiguration config;
 
 	public HashMap<Player, TimerBim> HandTimerBim = new HashMap<Player, TimerBim>();
 
@@ -66,9 +67,8 @@ public class GameManager extends JavaPlugin implements Listener {
 
 	public final String header = ChatColor.GREEN + "§l[BTOOOM] ";
 
-	FileConfiguration config;
-
 	public void onEnable() {
+		TitleSender = new TitleSender();
 		config = this.getConfig();
 
 		TimerBim TimerBim = new TimerBim();
@@ -213,23 +213,20 @@ public class GameManager extends JavaPlugin implements Listener {
 		Bukkit.broadcastMessage(header + ChatColor.RED + "準備時間の間は/spawnでスポーンし直すことが出来ます");
 		Bukkit.broadcastMessage(header + ChatColor.RED + "アイテムは試合開始後から使用可能です");
 
-		new BukkitRunnable() {
-			public void run() {
-				isStart = true;
-				Bukkit.broadcastMessage(header + ChatColor.LIGHT_PURPLE + "試合開始です");
-				for (Player p : Bukkit.getOnlinePlayers()) {
-					canThrow.put(p, true);
-					p.playSound(p.getLocation().add(0, 5, 0), Sound.ENTITY_FIREWORK_LARGE_BLAST, 1F, 1F);
-					TitleSender.sendTitle(p, ChatColor.GREEN + "§lBTOOOM !", "");
-				}
+		Bukkit.getScheduler().runTaskLater(this, () -> {
+			isStart = true;
+			Bukkit.broadcastMessage(header + ChatColor.LIGHT_PURPLE + "試合開始です");
+			for (Player p : Bukkit.getOnlinePlayers()) {
+				canThrow.put(p, true);
+				p.playSound(p.getLocation().add(0, 5, 0), Sound.ENTITY_FIREWORK_LARGE_BLAST, 1F, 1F);
+				TitleSender.sendTitle(p, ChatColor.GREEN + "§lBTOOOM !", "");
 			}
-		}.runTaskLater(this, 380);
-		new BukkitRunnable() {
-			public void run() {
-				for (Player p : Bukkit.getOnlinePlayers())
-					TitleSender.resetTitle(p);
+		}, 380);
+		Bukkit.getScheduler().runTaskLater(this, () -> {
+			for (Player p : Bukkit.getOnlinePlayers()) {
+				TitleSender.resetTitle(p);
 			}
-		}.runTaskLater(this, 440);
+		}, 440);
 	}
 
 	public Location respawn() {
