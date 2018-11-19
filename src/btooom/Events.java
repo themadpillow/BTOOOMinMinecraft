@@ -41,7 +41,7 @@ import bims.TimerBim;
 import net.md_5.bungee.api.ChatColor;
 
 public class Events implements Listener {
-	public static GameManager GameManager;
+	private GameManager GameManager;
 
 	public Events(GameManager instance) {
 		GameManager = instance;
@@ -49,10 +49,10 @@ public class Events implements Listener {
 
 	@EventHandler
 	public void join(PlayerJoinEvent e) {
-		if (GameManager.isStart) {
+		if (GameManager.isStart()) {
 			e.getPlayer().setGameMode(GameMode.SPECTATOR);
 			e.getPlayer().teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
-			e.getPlayer().sendMessage(GameManager.header + ChatColor.GRAY + "既に試合が開始されているため観戦者になりました");
+			e.getPlayer().sendMessage(GameManager.getHeader() + ChatColor.GRAY + "既に試合が開始されているため観戦者になりました");
 		}
 	}
 
@@ -66,30 +66,32 @@ public class Events implements Listener {
 		case LEFT_CLICK_BLOCK:
 			switch (e.getItem().getType()) {
 			case COAL: // TimerBim
-				if (GameManager.HandTimerBim.get(e.getPlayer()) == null) {
-					TimerBim TimerBim = new TimerBim();
-					GameManager.HandTimerBim.put(e.getPlayer(), TimerBim);
+				if (GameManager.getHandTimerBim().get(e.getPlayer()) == null) {
+					TimerBim TimerBim = new TimerBim(GameManager);
+					GameManager.getHandTimerBim().put(e.getPlayer(), TimerBim);
 					TimerBim.count(e.getPlayer());
 				}
+				break;
+			default:
 				break;
 			}
 			break;
 		case RIGHT_CLICK_AIR:
 		case RIGHT_CLICK_BLOCK:
-			if (GameManager.canThrow.get(e.getPlayer()) != null
-					&& (GameManager.canThrow.get(e.getPlayer()) || e.getPlayer().getGameMode() == GameMode.CREATIVE)) {
+			if (GameManager.getCanThrow().get(e.getPlayer()) != null
+					&& (GameManager.getCanThrow().get(e.getPlayer()) || e.getPlayer().getGameMode() == GameMode.CREATIVE)) {
 				switch (e.getItem().getType()) {
 				case COAL: // TimerBim
-					if (GameManager.HandTimerBim.get(e.getPlayer()) != null
-							&& ((TimerBim) GameManager.HandTimerBim.get(e.getPlayer())).bim == null) {
-						((TimerBim) GameManager.HandTimerBim.get(e.getPlayer())).Throw(e.getPlayer());
+					if (GameManager.getHandTimerBim().get(e.getPlayer()) != null
+							&& ((TimerBim) GameManager.getHandTimerBim().get(e.getPlayer())).bim == null) {
+						((TimerBim) GameManager.getHandTimerBim().get(e.getPlayer())).Throw(e.getPlayer());
 					} else {
-						TimerBim TimerBim = new TimerBim();
+						TimerBim TimerBim = new TimerBim(GameManager);
 						TimerBim.Throw(e.getPlayer());
 					}
 					break;
 				case FLINT:
-					CrackerBim CrackerBim = new CrackerBim();
+					CrackerBim CrackerBim = new CrackerBim(GameManager);
 					CrackerBim.Throw(e.getPlayer());
 					break;
 				case SLIME_BALL:
@@ -97,11 +99,11 @@ public class Events implements Listener {
 					if (target == null) {
 						return;
 					}
-					HomingBim HomingBim = new HomingBim();
+					HomingBim HomingBim = new HomingBim(GameManager);
 					HomingBim.Throw(e.getPlayer(), target);
 					break;
 				case FIREBALL:
-					FlameBim FlameBim = new FlameBim();
+					FlameBim FlameBim = new FlameBim(GameManager);
 					FlameBim.Throw(e.getPlayer());
 					break;
 				case COMPASS:
@@ -134,13 +136,15 @@ public class Events implements Listener {
 					return;
 				}
 				e.setCancelled(true);
-				GameManager.canThrow.put(e.getPlayer(), false);
+				GameManager.getCanThrow().put(e.getPlayer(), false);
 				new BukkitRunnable() {
 					public void run() {
-						GameManager.canThrow.put(e.getPlayer(), true);
+						GameManager.getCanThrow().put(e.getPlayer(), true);
 					}
 				}.runTaskLater(GameManager, 20L);
 			}
+			break;
+		default:
 			break;
 		}
 	}
@@ -153,7 +157,7 @@ public class Events implements Listener {
 			return;
 		}
 		Block block = e.getBlockPlaced();
-		InstallationBim InstallationBim = new InstallationBim();
+		InstallationBim InstallationBim = new InstallationBim(GameManager);
 		InstallationBim.set(e.getPlayer(), block);
 	}
 
@@ -162,7 +166,7 @@ public class Events implements Listener {
 		if (e.getCause() == DamageCause.CUSTOM) {
 			return;
 		}
-		if (GameManager.isStart == false) {
+		if (GameManager.isStart() == false) {
 			e.setCancelled(true);
 			return;
 		}
@@ -219,27 +223,27 @@ public class Events implements Listener {
 		if (e.getPlayer().getInventory().getItem(e.getNewSlot()) != null
 				&& e.getPlayer().getInventory().getItem(e.getNewSlot()).getType() == Material.COMPASS) {
 			ActionBarAPI.sendActionBar(e.getPlayer(),
-					"所持金：" + GameManager.money[GameManager.alivelist.indexOf(e.getPlayer())]);
+					"所持金：" + GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getPlayer())]);
 		}
-		GameManager.HandTimerBim.put(e.getPlayer(), null);
+		GameManager.getHandTimerBim().put(e.getPlayer(), null);
 	}
 
 	@EventHandler
 	public void queit(PlayerQuitEvent e) {
 		e.getPlayer().getInventory().clear();
-		if (GameManager.team.hasPlayer(e.getPlayer())) {
-			GameManager.team.removePlayer(e.getPlayer());
+		if (GameManager.getTeam().hasPlayer(e.getPlayer())) {
+			GameManager.getTeam().removePlayer(e.getPlayer());
 		}
-		if (GameManager.isStart) {
-			GameManager.alivelist.remove(e.getPlayer());
-			Bukkit.broadcastMessage(GameManager.header + ChatColor.RED + e.getPlayer().getName() + "さんが死亡しました"
+		if (GameManager.isStart()) {
+			GameManager.getAlivelist().remove(e.getPlayer());
+			Bukkit.broadcastMessage(GameManager.getHeader() + ChatColor.RED + e.getPlayer().getName() + "さんが死亡しました"
 					+ ChatColor.YELLOW + "(ログアウト)");
 
 			e.getPlayer().setGameMode(GameMode.SPECTATOR);
 
 			int i = 0;
 			Player winner = null;
-			for (Player p : GameManager.alivelist) {
+			for (Player p : GameManager.getAlivelist()) {
 				if (p != null) {
 					i++;
 					if (i > 1) {
@@ -262,58 +266,60 @@ public class Events implements Listener {
 				return;
 			}
 			e.setCancelled(true);
-			if (GameManager.canBuy.get(e.getWhoClicked())) {
+			if (GameManager.getCanBuy().get(e.getWhoClicked())) {
 				switch (e.getCurrentItem().getType()) {
 				case COAL:
-					if (GameManager.money[GameManager.alivelist.indexOf(e.getWhoClicked())] < 6) {
+					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 6) {
 						e.getWhoClicked().closeInventory();
-						e.getWhoClicked().sendMessage(GameManager.header + ChatColor.LIGHT_PURPLE + "所持金が足りません");
+						e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
 						break;
 					}
-					GameManager.money[GameManager.alivelist.indexOf(e.getWhoClicked())] -= 6;
-					e.getWhoClicked().getInventory().addItem(GameManager.Items.bims((byte) 0, (byte) 1));
+					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 6;
+					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims((byte) 0, (byte) 1));
 					break;
 				case FLINT:
-					if (GameManager.money[GameManager.alivelist.indexOf(e.getWhoClicked())] < 10) {
+					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 10) {
 						e.getWhoClicked().closeInventory();
-						e.getWhoClicked().sendMessage(GameManager.header + ChatColor.LIGHT_PURPLE + "所持金が足りません");
+						e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
 						break;
 					}
-					GameManager.money[GameManager.alivelist.indexOf(e.getWhoClicked())] -= 10;
-					e.getWhoClicked().getInventory().addItem(GameManager.Items.bims((byte) 1, (byte) 1));
+					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 10;
+					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims((byte) 1, (byte) 1));
 					break;
 				case FIREBALL:
-					if (GameManager.money[GameManager.alivelist.indexOf(e.getWhoClicked())] < 15) {
+					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 15) {
 						e.getWhoClicked().closeInventory();
-						e.getWhoClicked().sendMessage(GameManager.header + ChatColor.LIGHT_PURPLE + "所持金が足りません");
+						e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
 						break;
 					}
-					GameManager.money[GameManager.alivelist.indexOf(e.getWhoClicked())] -= 15;
-					e.getWhoClicked().getInventory().addItem(GameManager.Items.bims((byte) 2, (byte) 1));
+					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 15;
+					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims((byte) 2, (byte) 1));
 					break;
 				case SLIME_BALL:
-					if (GameManager.money[GameManager.alivelist.indexOf(e.getWhoClicked())] < 20) {
+					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 20) {
 						e.getWhoClicked().closeInventory();
-						e.getWhoClicked().sendMessage(GameManager.header + ChatColor.LIGHT_PURPLE + "所持金が足りません");
+						e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
 						break;
 					}
-					GameManager.money[GameManager.alivelist.indexOf(e.getWhoClicked())] -= 20;
-					e.getWhoClicked().getInventory().addItem(GameManager.Items.bims((byte) 3, (byte) 1));
+					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 20;
+					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims((byte) 3, (byte) 1));
 					break;
 				case SKULL_ITEM:
-					if (GameManager.money[GameManager.alivelist.indexOf(e.getWhoClicked())] < 30) {
+					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 30) {
 						e.getWhoClicked().closeInventory();
-						e.getWhoClicked().sendMessage(GameManager.header + ChatColor.LIGHT_PURPLE + "所持金が足りません");
+						e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
 						break;
 					}
-					GameManager.money[GameManager.alivelist.indexOf(e.getWhoClicked())] -= 30;
-					e.getWhoClicked().getInventory().addItem(GameManager.Items.bims((byte) 4, (byte) 1));
+					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 30;
+					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims((byte) 4, (byte) 1));
+					break;
+				default:
 					break;
 				}
-				GameManager.canBuy.put((Player) e.getWhoClicked(), false);
+				GameManager.getCanBuy().put((Player) e.getWhoClicked(), false);
 				new BukkitRunnable() {
 					public void run() {
-						GameManager.canBuy.put((Player) e.getWhoClicked(), true);
+						GameManager.getCanBuy().put((Player) e.getWhoClicked(), true);
 					}
 				}.runTaskLater(GameManager, 3L);
 			}
@@ -322,9 +328,9 @@ public class Events implements Listener {
 
 	@EventHandler
 	public void Death(PlayerDeathEvent e) {
-		GameManager.team.removePlayer(e.getEntity());
-		GameManager.alivelist.remove(e.getEntity());
-		e.setDeathMessage(GameManager.header + ChatColor.RED + e.getEntity().getName() + "さんが死亡しました");
+		GameManager.getTeam().removePlayer(e.getEntity());
+		GameManager.getAlivelist().remove(e.getEntity());
+		e.setDeathMessage(GameManager.getHeader() + ChatColor.RED + e.getEntity().getName() + "さんが死亡しました");
 
 		Bukkit.getScheduler().runTaskLater(GameManager, () -> {
 			e.getEntity().setBedSpawnLocation(e.getEntity().getLocation(), true);
@@ -332,8 +338,8 @@ public class Events implements Listener {
 			e.getEntity().setGameMode(GameMode.SPECTATOR);
 		}, 1L);
 
-		if (GameManager.alivelist.size() == 1) {
-			GameManager.gameover(GameManager.alivelist.get(0), false);
+		if (GameManager.getAlivelist().size() == 1) {
+			GameManager.gameover(GameManager.getAlivelist().get(0), false);
 		}
 	}
 
@@ -368,7 +374,7 @@ public class Events implements Listener {
 	@EventHandler
 	public void BlockBreak(BlockBreakEvent e) {
 		if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-			e.getPlayer().sendMessage(GameManager.header + ChatColor.RED + "ブロックの破壊は許可されていません");
+			e.getPlayer().sendMessage(GameManager.getHeader() + ChatColor.RED + "ブロックの破壊は許可されていません");
 			e.setCancelled(true);
 		}
 	}

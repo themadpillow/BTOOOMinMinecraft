@@ -12,9 +12,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import btooom.GameManager;
 
 public class InstallationBim {
-	public static GameManager GameManager;
+	private GameManager GameManager;
 	Block bim = null;
 	Location loc;
+
+	public InstallationBim(GameManager instance) {
+		GameManager = instance;
+	}
 
 	public void set(Player p, Block block) {
 		bim = block;

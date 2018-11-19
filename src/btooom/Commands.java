@@ -11,10 +11,10 @@ import org.bukkit.entity.Player;
 import net.md_5.bungee.api.ChatColor;
 
 public class Commands implements CommandExecutor {
-	public static GameManager GameManager;
+	private GameManager GameManager;
 
 	Commands(GameManager instance) {
-		this.GameManager = instance;
+		GameManager = instance;
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -22,11 +22,11 @@ public class Commands implements CommandExecutor {
 
 		if (cmd.getName().equalsIgnoreCase("start")) {
 			if (config.get("CenterLocation") == null) {
-				sender.sendMessage(GameManager.header + "CenterLocationが設定されていません。");
-				sender.sendMessage(GameManager.header + "座標に立ち、/set CenterLocation で設定できます");
+				sender.sendMessage(GameManager.getHeader() + "CenterLocationが設定されていません。");
+				sender.sendMessage(GameManager.getHeader() + "座標に立ち、/set CenterLocation で設定できます");
 			} else if (config.get("WorldRange") == null) {
-				sender.sendMessage(GameManager.header + "WorldRangeが設定されていません。");
-				sender.sendMessage(GameManager.header + "/set WorldRange <範囲> で設定できます");
+				sender.sendMessage(GameManager.getHeader() + "WorldRangeが設定されていません。");
+				sender.sendMessage(GameManager.getHeader() + "/set WorldRange <範囲> で設定できます");
 			} else {
 				GameManager.start();
 			}
@@ -61,27 +61,27 @@ public class Commands implements CommandExecutor {
 			return false;
 		}
 		if (cmd.getName().equalsIgnoreCase("spawn")) {
-			if ((GameManager.board.getPlayerTeam((Player) sender)) == null) {
-				sender.sendMessage(GameManager.header + ChatColor.RED + "準備時間中のみ使用可能です");
+			if ((GameManager.getBoard().getPlayerTeam((Player) sender)) == null) {
+				sender.sendMessage(GameManager.getHeader() + ChatColor.RED + "準備時間中のみ使用可能です");
 				return true;
 			}
-			if (GameManager.isStart) {
-				sender.sendMessage(GameManager.header + ChatColor.RED + "準備時間中のみ使用可能です");
+			if (GameManager.isStart()) {
+				sender.sendMessage(GameManager.getHeader() + ChatColor.RED + "準備時間中のみ使用可能です");
 				return true;
 			}
 			((Player) sender).teleport(GameManager.respawn());
-			sender.sendMessage(GameManager.header + ChatColor.RED + "リスポーンしました");
+			sender.sendMessage(GameManager.getHeader() + ChatColor.RED + "リスポーンしました");
 			return true;
 		}
 		if (cmd.getName().equalsIgnoreCase("s") || cmd.getName().equalsIgnoreCase("shop")) {
 			if (((Player) sender).getGameMode() == GameMode.SPECTATOR) {
-				sender.sendMessage(GameManager.header + ChatColor.GRAY + "観戦者は購入できません");
+				sender.sendMessage(GameManager.getHeader() + ChatColor.GRAY + "観戦者は購入できません");
 			}
 
-			if (GameManager.isStart || sender.isOp()) {
-				((Player) sender).openInventory(GameManager.Items.BuyBimInventory);
+			if (GameManager.isStart() || sender.isOp()) {
+				((Player) sender).openInventory(GameManager.getItems().BuyBimInventory);
 			} else {
-				sender.sendMessage(GameManager.header + ChatColor.GRAY + "試合中のみ使用できます");
+				sender.sendMessage(GameManager.getHeader() + ChatColor.GRAY + "試合中のみ使用できます");
 			}
 
 			return true;

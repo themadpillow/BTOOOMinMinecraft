@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
  * 1.8から追加された/titleコマンドと同等の事が出来るclassです。
  */
 public class TitleSender {
-
 	// 注意::パケットを直接送信しています、良く分からない場合は変更しないで下さい(バグりますよ?
 
 	// class取得用の変数

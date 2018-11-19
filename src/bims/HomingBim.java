@@ -10,9 +10,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import btooom.GameManager;
 
 public class HomingBim {
-	public static GameManager GameManager;
+	private GameManager GameManager;
 
 	Snowball bim = null;
+
+	public HomingBim(GameManager instance) {
+		GameManager = instance;
+	}
 
 	public void Throw(Player p, Player target) {
 		if (p.getInventory().getItemInHand().getAmount() == 1) {

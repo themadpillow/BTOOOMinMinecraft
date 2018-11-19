@@ -46,68 +46,63 @@ import other.Timer;
 import other.TitleSender;
 
 public class GameManager extends JavaPlugin implements Listener {
-	Items Items = new Items();
-	Timer Timer = new Timer(this);
-	TitleSender TitleSender;
-	FileConfiguration config;
+	private Items Items = new Items();
+	private Timer Timer = new Timer(this);
+	private TitleSender TitleSender;
+	private FileConfiguration config;
 
-	public HashMap<Player, TimerBim> HandTimerBim = new HashMap<Player, TimerBim>();
+	private HashMap<Player, TimerBim> HandTimerBim = new HashMap<Player, TimerBim>();
 
-	HashMap<Player, Boolean> canThrow = new HashMap<Player, Boolean>();
-	HashMap<Player, Boolean> canBuy = new HashMap<Player, Boolean>();
+	private HashMap<Player, Boolean> canThrow = new HashMap<Player, Boolean>();
+	private HashMap<Player, Boolean> canBuy = new HashMap<Player, Boolean>();
 
-	int money[];
+	private int money[];
 
-	static boolean isStart = false;
-	public static Scoreboard board = null;
-	static Team team = null;
-	public static Objective info = null;
+	private boolean isStart = false;
+	private Scoreboard board = null;
+	private Team team = null;
+	private Objective info = null;
 
-	static List<Player> alivelist = new ArrayList<Player>();
+	private List<Player> alivelist = new ArrayList<Player>();
 
-	public final String header = ChatColor.GREEN + "§l[BTOOOM] ";
+	private static final String header = ChatColor.GREEN + "§l[BTOOOM] ";
 
 	public void onEnable() {
 		TitleSender = new TitleSender();
 		config = this.getConfig();
 
-		TimerBim TimerBim = new TimerBim();
-		TimerBim.GameManager = this;
-		CrackerBim CrackerBim = new CrackerBim();
-		CrackerBim.GameManager = this;
-		FlameBim FlameBim = new FlameBim();
-		FlameBim.GameManager = this;
-		InstallationBim InstallationBim = new InstallationBim();
-		InstallationBim.GameManager = this;
-		HomingBim HomingBim = new HomingBim();
-		HomingBim.GameManager = this;
+		new TimerBim(this);
+		new CrackerBim(this);
+		new FlameBim(this);
+		new InstallationBim(this);
+		new HomingBim(this);
 
 		if (config.get("Timer") == null) {
 			config.set("Timer", true);
 			this.saveConfig();
 		}
 
-		Items.setBuyBimInventory();
+		getItems().setBuyBimInventory();
 
-		board = Bukkit.getScoreboardManager().getMainScoreboard();
-		if (board.getTeam("team") == null) {
-			team = board.registerNewTeam("team");
+		setBoard(Bukkit.getScoreboardManager().getMainScoreboard());
+		if (getBoard().getTeam("team") == null) {
+			setTeam(getBoard().registerNewTeam("team"));
 		} else {
-			team = board.getTeam("team");
+			setTeam(getBoard().getTeam("team"));
 		}
 
-		team.setAllowFriendlyFire(true);
-		team.setNameTagVisibility(NameTagVisibility.HIDE_FOR_OWN_TEAM);
+		getTeam().setAllowFriendlyFire(true);
+		getTeam().setNameTagVisibility(NameTagVisibility.HIDE_FOR_OWN_TEAM);
 
 		if ((boolean) config.get("Timer")) {
-			if (board.getObjective(ChatColor.DARK_GREEN + "BTOOOM!") == null)
-				info = board.registerNewObjective(ChatColor.DARK_GREEN + "BTOOOM!", "info");
+			if (getBoard().getObjective(ChatColor.DARK_GREEN + "BTOOOM!") == null)
+				setInfo(getBoard().registerNewObjective(ChatColor.DARK_GREEN + "BTOOOM!", "info"));
 			else {
-				info = board.getObjective(ChatColor.DARK_GREEN + "BTOOOM!");
+				setInfo(getBoard().getObjective(ChatColor.DARK_GREEN + "BTOOOM!"));
 			}
-			info.setDisplaySlot(DisplaySlot.SIDEBAR);
+			getInfo().setDisplaySlot(DisplaySlot.SIDEBAR);
 
-			Score score = info.getScore("試合開始前です");
+			Score score = getInfo().getScore("試合開始前です");
 			score.setScore(0);
 		}
 
@@ -128,8 +123,8 @@ public class GameManager extends JavaPlugin implements Listener {
 					entity.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
 					((Player) entity).setGameMode(GameMode.SURVIVAL);
 				}
-				canThrow.put((Player) entity, false);
-				canBuy.put((Player) entity, false);
+				getCanThrow().put((Player) entity, false);
+				getCanBuy().put((Player) entity, false);
 				((Player) entity).removePotionEffect(PotionEffectType.INVISIBILITY);
 
 			}
@@ -139,11 +134,11 @@ public class GameManager extends JavaPlugin implements Listener {
 	}
 
 	public void onDisable() {
-		if (info != null) {
-			info.unregister();
+		if (getInfo() != null) {
+			getInfo().unregister();
 		}
-		if (team != null) {
-			team.unregister();
+		if (getTeam() != null) {
+			getTeam().unregister();
 		}
 	}
 
@@ -174,50 +169,50 @@ public class GameManager extends JavaPlugin implements Listener {
 			}
 		}
 
-		BimConfig damageConfig = new BimConfig(new CustomConfig(this, "bimConfig.yml"));
+		new BimConfig(new CustomConfig(this, "bimConfig.yml"));
 	}
 
 	public void start() {
 
 		if ((boolean) config.get("Timer")) {
-			Timer.timer(20, 20);
+			Timer.start(20, 20);
 		}
 
 		for (Player p : Bukkit.getOnlinePlayers()) {
-			alivelist.add(p);
-			canThrow.put(p, false);
-			canBuy.put(p, true);
+			getAlivelist().add(p);
+			getCanThrow().put(p, false);
+			getCanBuy().put(p, true);
 
 			p.getInventory().clear();
 			p.setGameMode(GameMode.SURVIVAL);
-			p.getInventory().setItem(0, Items.bims((byte) 0, (byte) 1));
+			p.getInventory().setItem(0, getItems().bims((byte) 0, (byte) 1));
 			for (int i = 0; i < 9; i++) {
-				p.getInventory().addItem(Items.bims((byte) 0, (byte) 1));
+				p.getInventory().addItem(getItems().bims((byte) 0, (byte) 1));
 			}
-			p.getInventory().setItem(8, Items.otherItem((byte) 0));
-			team.addPlayer(p);
+			p.getInventory().setItem(8, getItems().otherItem((byte) 0));
+			getTeam().addPlayer(p);
 			p.teleport(respawn());
 		}
 
-		money = new int[alivelist.size()];
-		Arrays.fill(money, 30);
+		setMoney(new int[getAlivelist().size()]);
+		Arrays.fill(getMoney(), 30);
 		new BukkitRunnable() {
 			public void run() {
-				for (int i = 0; i < money.length; i++) {
-					money[i] += 5;
+				for (int i = 0; i < getMoney().length; i++) {
+					getMoney()[i] += 5;
 				}
 			}
 		}.runTaskTimer(this, 100L, 100L);
 
-		Bukkit.broadcastMessage(header + ChatColor.RED + "20秒後に試合が開始します！");
-		Bukkit.broadcastMessage(header + ChatColor.RED + "準備時間の間は/spawnでスポーンし直すことが出来ます");
-		Bukkit.broadcastMessage(header + ChatColor.RED + "アイテムは試合開始後から使用可能です");
+		Bukkit.broadcastMessage(getHeader() + ChatColor.RED + "20秒後に試合が開始します！");
+		Bukkit.broadcastMessage(getHeader() + ChatColor.RED + "準備時間の間は/spawnでスポーンし直すことが出来ます");
+		Bukkit.broadcastMessage(getHeader() + ChatColor.RED + "アイテムは試合開始後から使用可能です");
 
 		Bukkit.getScheduler().runTaskLater(this, () -> {
-			isStart = true;
-			Bukkit.broadcastMessage(header + ChatColor.LIGHT_PURPLE + "試合開始です");
+			setStart(true);
+			Bukkit.broadcastMessage(getHeader() + ChatColor.LIGHT_PURPLE + "試合開始です");
 			for (Player p : Bukkit.getOnlinePlayers()) {
-				canThrow.put(p, true);
+				getCanThrow().put(p, true);
 				p.playSound(p.getLocation().add(0, 5, 0), Sound.ENTITY_FIREWORK_LARGE_BLAST, 1F, 1F);
 				TitleSender.sendTitle(p, ChatColor.GREEN + "§lBTOOOM !", "");
 			}
@@ -291,15 +286,14 @@ public class GameManager extends JavaPlugin implements Listener {
 	public void gameover(Player winner, boolean sixstar) {
 
 		if ((boolean) config.get("Timer")) {
-			Timer.TimerTaskID.cancel();
+			Timer.getTimerTaskID().cancel();
 		}
-		GameManager.isStart = false;
+		setStart(false);
 
-		FileConfiguration config = this.getConfig();
 		int star = 0;
 		if (winner == null) {
 			for (Player p : Bukkit.getOnlinePlayers()) {
-				p.sendMessage(header + ChatColor.RED + "時間切れにより勝者が決定しました");
+				p.sendMessage(getHeader() + ChatColor.RED + "時間切れにより勝者が決定しました");
 				if (p.getGameMode() == GameMode.SPECTATOR) {
 					continue;
 				}
@@ -330,7 +324,7 @@ public class GameManager extends JavaPlugin implements Listener {
 					}
 				}
 				for (Player all : Bukkit.getOnlinePlayers()) {
-					all.sendMessage(header + ChatColor.RED + winner.getName() + "さんがクリスタルを6個以上集めました");
+					all.sendMessage(getHeader() + ChatColor.RED + winner.getName() + "さんがクリスタルを6個以上集めました");
 					all.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), TeleportCause.ENDER_PEARL);
 					TitleSender.sendTitle(all, ChatColor.DARK_RED + "勝者:" + ChatColor.DARK_GREEN + winner.getName(),
 							ChatColor.YELLOW + "獲得クリスタル数：" + star + "個");
@@ -341,7 +335,7 @@ public class GameManager extends JavaPlugin implements Listener {
 			}
 		} else {
 			for (Player all : Bukkit.getOnlinePlayers()) {
-				all.sendMessage(header + ChatColor.RED + winner.getName() + "さんが最後の生存者です");
+				all.sendMessage(getHeader() + ChatColor.RED + winner.getName() + "さんが最後の生存者です");
 				all.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), TeleportCause.ENDER_PEARL);
 				TitleSender.sendTitle(all, ChatColor.DARK_RED + "勝者:" + ChatColor.DARK_GREEN + winner.getName(),
 						ChatColor.YELLOW + "獲得クリスタル数：" + star + "個");
@@ -360,13 +354,97 @@ public class GameManager extends JavaPlugin implements Listener {
 					entity.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
 					((Player) entity).setGameMode(GameMode.SURVIVAL);
 				}
-				canThrow.put((Player) entity, false);
-				canBuy.put((Player) entity, false);
+				getCanThrow().put((Player) entity, false);
+				getCanBuy().put((Player) entity, false);
 				((Player) entity).removePotionEffect(PotionEffectType.INVISIBILITY);
 
 			} else if (entity instanceof Item) {
 				entity.remove();
 			}
 		}
+	}
+
+	public HashMap<Player, TimerBim> getHandTimerBim() {
+		return HandTimerBim;
+	}
+
+	public void setHandTimerBim(HashMap<Player, TimerBim> handTimerBim) {
+		HandTimerBim = handTimerBim;
+	}
+
+	public String getHeader() {
+		return header;
+	}
+
+	public boolean isStart() {
+		return isStart;
+	}
+
+	public void setStart(boolean isStart) {
+		this.isStart = isStart;
+	}
+
+	public Scoreboard getBoard() {
+		return board;
+	}
+
+	public void setBoard(Scoreboard board) {
+		this.board = board;
+	}
+
+	public Items getItems() {
+		return Items;
+	}
+
+	public void setItems(Items items) {
+		Items = items;
+	}
+
+	public HashMap<Player, Boolean> getCanThrow() {
+		return canThrow;
+	}
+
+	public void setCanThrow(HashMap<Player, Boolean> canThrow) {
+		this.canThrow = canThrow;
+	}
+
+	public int[] getMoney() {
+		return money;
+	}
+
+	public void setMoney(int money[]) {
+		this.money = money;
+	}
+
+	public Team getTeam() {
+		return team;
+	}
+
+	public void setTeam(Team team) {
+		this.team = team;
+	}
+
+	public List<Player> getAlivelist() {
+		return alivelist;
+	}
+
+	public void setAlivelist(List<Player> alivelist) {
+		this.alivelist = alivelist;
+	}
+
+	public HashMap<Player, Boolean> getCanBuy() {
+		return canBuy;
+	}
+
+	public void setCanBuy(HashMap<Player, Boolean> canBuy) {
+		this.canBuy = canBuy;
+	}
+
+	public Objective getInfo() {
+		return info;
+	}
+
+	public void setInfo(Objective info) {
+		this.info = info;
 	}
 }

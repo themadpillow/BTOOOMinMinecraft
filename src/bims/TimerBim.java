@@ -15,10 +15,14 @@ import com.connorlinfoot.actionbarapi.ActionBarAPI;
 import btooom.GameManager;
 
 public class TimerBim {
-	public static GameManager GameManager;
+	private GameManager GameManager;
 
 	int timer = 5;
 	public Item bim = null;
+
+	public TimerBim(GameManager instance) {
+		GameManager = instance;
+	}
 
 	public void count(Player p) {
 		new BukkitRunnable() {
@@ -28,7 +32,7 @@ public class TimerBim {
 					if (p.getItemInHand() == null
 							|| p.getItemInHand().getType() != Material.COAL) {
 						this.cancel();
-						GameManager.HandTimerBim.put(p, null);
+						GameManager.getHandTimerBim().put(p, null);
 						return;
 					}
 					p.playSound(p.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 0.5F, 3F);
@@ -43,7 +47,7 @@ public class TimerBim {
 				}
 				if (timer < 1) {
 					this.cancel();
-					GameManager.HandTimerBim.put(p, null);
+					GameManager.getHandTimerBim().put(p, null);
 					if (bim == null) {
 						p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, (byte) 4);
 						Bukkit.getScheduler().runTaskLater(GameManager, () -> {

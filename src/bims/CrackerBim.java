@@ -8,8 +8,12 @@ import org.bukkit.metadata.FixedMetadataValue;
 import btooom.GameManager;
 
 public class CrackerBim implements Listener {
-	public static GameManager GameManager;
+	private GameManager GameManager;
 	Snowball bim = null;
+
+	public CrackerBim(GameManager instance) {
+		GameManager = instance;
+	}
 
 	public void Throw(Player p) {
 		if (p.getInventory().getItemInHand().getAmount() == 1) {

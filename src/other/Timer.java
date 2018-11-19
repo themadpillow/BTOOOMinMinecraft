@@ -11,28 +11,27 @@ import btooom.GameManager;
 import net.md_5.bungee.api.ChatColor;
 
 public class Timer {
-	public static GameManager GameManager;
+	private GameManager GameManager;
 
 	public Timer(GameManager instance) {
 		GameManager = instance;
 	}
 
-	static int MIN;
-	static int SEC;
-	static String s;
-	static Score timer;
-	public static BukkitTask TimerTaskID;
+	private int MIN;
+	private int SEC;
+	private String s;
+	private Score timer;
+	private BukkitTask TimerTaskID;
 
-	public static void timer(int min, int sec) {
+	public void start(int min, int sec) {
 		MIN = min;
 		SEC = sec;
 		s = (ChatColor.GREEN + "残り時間 : " + MIN + ":" + String.format("%1$02d", SEC));
-		timer = GameManager.info.getScore(s);
-		GameManager.board.resetScores("試合開始前です");
-		TimerTaskID = new BukkitRunnable() {
+		timer = GameManager.getInfo().getScore(s);
+		GameManager.getBoard().resetScores("試合開始前です");
+		setTimerTaskID(new BukkitRunnable() {
 			public void run() {
-
-				GameManager.board.resetScores(s);
+				GameManager.getBoard().resetScores(s);
 
 				if (SEC != 0) {
 					SEC--;
@@ -45,7 +44,7 @@ public class Timer {
 				if (MIN == 0) {
 					switch (SEC) {
 					case 30:
-						Bukkit.broadcastMessage(GameManager.header + ChatColor.LIGHT_PURPLE + "試合終了まで残り30秒です");
+						Bukkit.broadcastMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "試合終了まで残り30秒です");
 						break;
 					case 5:
 					case 4:
@@ -54,7 +53,7 @@ public class Timer {
 					case 1:
 						for (Player p : Bukkit.getOnlinePlayers())
 							p.playSound(p.getLocation(), Sound.BLOCK_WOOD_BUTTON_CLICK_ON, 1F, 1F);
-						Bukkit.broadcastMessage(GameManager.header + ChatColor.LIGHT_PURPLE + "試合終了まで " + SEC + "...");
+						Bukkit.broadcastMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "試合終了まで " + SEC + "...");
 						break;
 					case 0:
 						GameManager.gameover(null, false);
@@ -64,9 +63,17 @@ public class Timer {
 				}
 
 				s = (ChatColor.GREEN + "残り時間 : " + MIN + ":" + String.format("%1$02d", SEC));
-				timer = GameManager.info.getScore(s);
+				timer = GameManager.getInfo().getScore(s);
 				timer.setScore(0);
 			}
-		}.runTaskTimer(GameManager, 0L, 20L);
+		}.runTaskTimer(GameManager, 0L, 20L));
+	}
+
+	public BukkitTask getTimerTaskID() {
+		return TimerTaskID;
+	}
+
+	public void setTimerTaskID(BukkitTask timerTaskID) {
+		TimerTaskID = timerTaskID;
 	}
 }
