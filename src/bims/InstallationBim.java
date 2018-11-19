@@ -19,16 +19,15 @@ public class InstallationBim {
 	public void set(Player p, Block block) {
 		bim = block;
 		search(p);
-		new BukkitRunnable() {
-			public void run() {
-				if (bim != null) {
-					loc = bim.getLocation();
-					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(), 2.5F, false, false);
-					bim.setType(Material.AIR);
-					bim = null;
-				}
+		Bukkit.getScheduler().runTaskLater(GameManager, () -> {
+			if (bim != null) {
+				loc = bim.getLocation();
+				Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(), 2.5F, false, false);
+				bim.setType(Material.AIR);
+				bim = null;
 			}
-		}.runTaskLater(GameManager, 1200L);
+		}, 1200L);
+
 	}
 
 	public void search(Player p) {

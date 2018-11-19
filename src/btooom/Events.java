@@ -326,13 +326,11 @@ public class Events implements Listener {
 		GameManager.alivelist.remove(e.getEntity());
 		e.setDeathMessage(GameManager.header + ChatColor.RED + e.getEntity().getName() + "さんが死亡しました");
 
-		new BukkitRunnable() {
-			public void run() {
-				e.getEntity().setBedSpawnLocation(e.getEntity().getLocation(), true);
-				e.getEntity().spigot().respawn();
-				e.getEntity().setGameMode(GameMode.SPECTATOR);
-			}
-		}.runTaskLater(GameManager, 1L);
+		Bukkit.getScheduler().runTaskLater(GameManager, () -> {
+			e.getEntity().setBedSpawnLocation(e.getEntity().getLocation(), true);
+			e.getEntity().spigot().respawn();
+			e.getEntity().setGameMode(GameMode.SPECTATOR);
+		}, 1L);
 
 		if (GameManager.alivelist.size() == 1) {
 			GameManager.gameover(GameManager.alivelist.get(0), false);
