@@ -1,5 +1,5 @@
 package bims;
 
-public enum Status {
+enum Status {
 	Default, Run, Shift;
 }

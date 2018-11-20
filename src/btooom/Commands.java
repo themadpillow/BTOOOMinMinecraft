@@ -13,7 +13,7 @@ import net.md_5.bungee.api.ChatColor;
 public class Commands implements CommandExecutor {
 	private GameManager GameManager;
 
-	Commands(GameManager instance) {
+	protected Commands(GameManager instance) {
 		GameManager = instance;
 	}
 
@@ -79,7 +79,7 @@ public class Commands implements CommandExecutor {
 			}
 
 			if (GameManager.isStart() || sender.isOp()) {
-				((Player) sender).openInventory(GameManager.getItems().BuyBimInventory);
+				((Player) sender).openInventory(GameManager.getItems().getBuyBimInventory());
 			} else {
 				sender.sendMessage(GameManager.getHeader() + ChatColor.GRAY + "試合中のみ使用できます");
 			}

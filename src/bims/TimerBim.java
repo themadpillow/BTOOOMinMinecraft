@@ -16,9 +16,8 @@ import btooom.GameManager;
 
 public class TimerBim {
 	private GameManager GameManager;
-
-	int timer = 5;
-	public Item bim = null;
+	private static int timer = 5;
+	private Item bim = null;
 
 	public TimerBim(GameManager instance) {
 		GameManager = instance;
@@ -28,7 +27,7 @@ public class TimerBim {
 		new BukkitRunnable() {
 			public void run() {
 				timer--;
-				if (bim == null) {
+				if (getBim() == null) {
 					if (p.getItemInHand() == null
 							|| p.getItemInHand().getType() != Material.COAL) {
 						this.cancel();
@@ -36,29 +35,31 @@ public class TimerBim {
 						return;
 					}
 					p.playSound(p.getLocation(), Sound.BLOCK_STONE_BUTTON_CLICK_ON, 0.5F, 3F);
-					//		String s = "";
-					//		for(int i = 0; i < timer; i ++){
-					//			s = s.concat("⬛");
-					//		}
-					//		for(int i = 0; s.length() < 5; i ++){
-					//			s = s.concat("⃞");
-					//	}
-					ActionBarAPI.sendActionBar(p, ChatColor.RED + "§l" + timer);
+
+					StringBuilder s = new StringBuilder();
+					for (int i = 0; i < timer; i++) {
+						s.append("■");
+					}
+					for (int i = s.length(); i < 5; i++) {
+						s.append("□");
+					}
+					ActionBarAPI.sendActionBar(p, ChatColor.RED + "§l" + s);
 				}
 				if (timer < 1) {
 					this.cancel();
 					GameManager.getHandTimerBim().put(p, null);
-					if (bim == null) {
+					if (getBim() == null) {
 						p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, (byte) 4);
 						Bukkit.getScheduler().runTaskLater(GameManager, () -> {
 							p.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 1, (byte) 4);
 						}, 1L);
 						return;
 					} else {
-						bim.remove();
-						Bukkit.getWorlds().get(0).createExplosion(bim.getLocation().getX(), bim.getLocation().getY(),
-								bim.getLocation().getZ(), BimConfig.getDamage(Bims.TimerBim), false, false);
-						bim = null;
+						getBim().remove();
+						Bukkit.getWorlds().get(0).createExplosion(getBim().getLocation().getX(),
+								getBim().getLocation().getY(),
+								getBim().getLocation().getZ(), BimConfig.getDamage(Bims.TimerBim), false, false);
+						setBim(null);
 					}
 				}
 			}
@@ -72,17 +73,25 @@ public class TimerBim {
 			p.getInventory().getItemInHand().setAmount(p.getInventory().getItemInHand().getAmount() - 1);
 		}
 
-		bim = Bukkit.getWorlds().get(0).dropItem(p.getEyeLocation(), new ItemStack(Material.COAL));
-		bim.setMetadata("nopickup", new FixedMetadataValue(GameManager, true));
+		setBim(Bukkit.getWorlds().get(0).dropItem(p.getEyeLocation(), new ItemStack(Material.COAL)));
+		getBim().setMetadata("nopickup", new FixedMetadataValue(GameManager, true));
 		if (p.isSneaking()) {
-			bim.setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Shift)));
+			getBim().setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Shift)));
 		} else if (p.isSprinting()) {
-			bim.setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Run)));
+			getBim().setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Run)));
 		} else {
-			bim.setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Default)));
+			getBim().setVelocity(p.getLocation().getDirection().multiply(BimConfig.getThrowRange(Status.Default)));
 		}
 		if (timer == 5) {
 			count(p);
 		}
+	}
+
+	public Item getBim() {
+		return bim;
+	}
+
+	private void setBim(Item bim) {
+		this.bim = bim;
 	}
 }

@@ -13,8 +13,7 @@ import btooom.GameManager;
 
 public class InstallationBim {
 	private GameManager GameManager;
-	Block bim = null;
-	Location loc;
+	private Block bim = null;
 
 	public InstallationBim(GameManager instance) {
 		GameManager = instance;
@@ -25,7 +24,7 @@ public class InstallationBim {
 		search(p);
 		Bukkit.getScheduler().runTaskLater(GameManager, () -> {
 			if (bim != null) {
-				loc = bim.getLocation();
+				Location loc = bim.getLocation();
 				Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(), 2.5F, false, false);
 				bim.setType(Material.AIR);
 				bim = null;
@@ -34,7 +33,7 @@ public class InstallationBim {
 
 	}
 
-	public void search(Player p) {
+	private void search(Player p) {
 		new BukkitRunnable() {
 			public void run() {
 				if (bim == null) {
@@ -47,9 +46,11 @@ public class InstallationBim {
 						BimConfig.getInstallationRange(),
 						BimConfig.getInstallationRange(),
 						BimConfig.getInstallationRange())) {
-					if ((e instanceof Player && ((Player) e).getGameMode() == GameMode.SPECTATOR)
-							|| e == p)
+					if (e instanceof Player
+							&& (((Player) e).getGameMode() == GameMode.SPECTATOR
+									|| e == p)) {
 						continue;
+					}
 					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(),
 							BimConfig.getDamage(Bims.InstallationBim), false, false);
 					bim.setType(Material.AIR);

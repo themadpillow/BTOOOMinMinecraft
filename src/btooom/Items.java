@@ -10,27 +10,26 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import bims.Bims;
 import net.md_5.bungee.api.ChatColor;
 
 public class Items {
-	ItemStack skull = null;
-	Inventory BuyBimInventory = null;
+	private Inventory BuyBimInventory = null;
 
 	public void setBuyBimInventory() {
 		BuyBimInventory = Bukkit.createInventory(null, 9, ChatColor.DARK_GREEN + "§lBIM購入");
-		BuyBimInventory.setItem(0, bims((byte) 0, (byte) 0));
-		BuyBimInventory.setItem(2, bims((byte) 1, (byte) 0));
-		BuyBimInventory.setItem(4, bims((byte) 2, (byte) 0));
-		BuyBimInventory.setItem(6, bims((byte) 3, (byte) 0));
-		BuyBimInventory.setItem(8, bims((byte) 4, (byte) 0));
+		BuyBimInventory.setItem(0, bims(Bims.TimerBim, (byte) 0));
+		BuyBimInventory.setItem(2, bims(Bims.CrackerBim, (byte) 0));
+		BuyBimInventory.setItem(4, bims(Bims.FlameBim, (byte) 0));
+		BuyBimInventory.setItem(6, bims(Bims.HomingBim, (byte) 0));
+		BuyBimInventory.setItem(8, bims(Bims.InstallationBim, (byte) 0));
 	}
 
-	public ItemStack bims(byte number, byte type) {
+	public ItemStack bims(Bims bims, byte type) {
 		ItemStack item = null;
 		ItemMeta meta = null;
 		ArrayList<String> lores = new ArrayList<String>();
-		switch (number) {
-		case 0:
+		if (bims == Bims.TimerBim) {
 			item = new ItemStack(Material.COAL);
 			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.RED + "§lタイマーBIM");
@@ -41,8 +40,7 @@ public class Items {
 				lores.add("右クリック  ：投げる");
 				lores.add("起爆カウント： 5sec");
 			}
-			break;
-		case 1:
+		} else if (bims == Bims.CrackerBim) {
 			item = new ItemStack(Material.FLINT);
 			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.BLUE + "§lクラッカーBIM");
@@ -52,8 +50,7 @@ public class Items {
 				lores.add("右クリック：投げる");
 				lores.add("ブロックやプレイヤーに当たった瞬間爆発する");
 			}
-			break;
-		case 2:
+		} else if (bims == Bims.FlameBim) {
 			item = new ItemStack(Material.FIREBALL);
 			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.DARK_RED + "フレイムBIM");
@@ -63,8 +60,7 @@ public class Items {
 				lores.add("右クリック：投げる");
 				lores.add("着弾地点から十字に火を放つ");
 			}
-			break;
-		case 3:
+		} else if (bims == Bims.HomingBim) {
 			item = new ItemStack(Material.SLIME_BALL);
 			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.LIGHT_PURPLE + "§lホーミングBIM");
@@ -75,8 +71,7 @@ public class Items {
 				lores.add("ロックオンしたプレイヤーを追尾する");
 				lores.add("ブロックやプレイヤーにぶつかった瞬間爆発する");
 			}
-			break;
-		case 4:
+		} else if (bims == Bims.InstallationBim) {
 			item = new ItemStack(Material.SKULL_ITEM, 1, (short) 3, (byte) SkullType.PLAYER.ordinal());
 			SkullMeta skullmeta = (SkullMeta) item.getItemMeta();
 			skullmeta.setOwner("MHF_TNT");
@@ -91,7 +86,8 @@ public class Items {
 			skullmeta.setLore(lores);
 			item.setItemMeta(skullmeta);
 			return item;
-		//		break;
+		} else {
+			throw new RuntimeException("不正なBIMが指定されました");
 		}
 
 		meta.setLore(lores);
@@ -116,5 +112,9 @@ public class Items {
 		meta.setLore(lores);
 		item.setItemMeta(meta);
 		return item;
+	}
+
+	public Inventory getBuyBimInventory() {
+		return BuyBimInventory;
 	}
 }

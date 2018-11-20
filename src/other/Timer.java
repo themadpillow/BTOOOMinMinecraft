@@ -13,15 +13,15 @@ import net.md_5.bungee.api.ChatColor;
 public class Timer {
 	private GameManager GameManager;
 
-	public Timer(GameManager instance) {
-		GameManager = instance;
-	}
-
 	private int MIN;
 	private int SEC;
 	private String s;
 	private Score timer;
 	private BukkitTask TimerTaskID;
+
+	public Timer(GameManager instance) {
+		GameManager = instance;
+	}
 
 	public void start(int min, int sec) {
 		MIN = min;
@@ -53,7 +53,8 @@ public class Timer {
 					case 1:
 						for (Player p : Bukkit.getOnlinePlayers())
 							p.playSound(p.getLocation(), Sound.BLOCK_WOOD_BUTTON_CLICK_ON, 1F, 1F);
-						Bukkit.broadcastMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "試合終了まで " + SEC + "...");
+						Bukkit.broadcastMessage(
+								GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "試合終了まで " + SEC + "...");
 						break;
 					case 0:
 						GameManager.gameover(null, false);
@@ -73,7 +74,7 @@ public class Timer {
 		return TimerTaskID;
 	}
 
-	public void setTimerTaskID(BukkitTask timerTaskID) {
+	private void setTimerTaskID(BukkitTask timerTaskID) {
 		TimerTaskID = timerTaskID;
 	}
 }

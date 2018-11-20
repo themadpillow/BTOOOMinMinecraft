@@ -79,11 +79,12 @@ public class Events implements Listener {
 		case RIGHT_CLICK_AIR:
 		case RIGHT_CLICK_BLOCK:
 			if (GameManager.getCanThrow().get(e.getPlayer()) != null
-					&& (GameManager.getCanThrow().get(e.getPlayer()) || e.getPlayer().getGameMode() == GameMode.CREATIVE)) {
+					&& (GameManager.getCanThrow().get(e.getPlayer())
+							|| e.getPlayer().getGameMode() == GameMode.CREATIVE)) {
 				switch (e.getItem().getType()) {
 				case COAL: // TimerBim
 					if (GameManager.getHandTimerBim().get(e.getPlayer()) != null
-							&& ((TimerBim) GameManager.getHandTimerBim().get(e.getPlayer())).bim == null) {
+							&& ((TimerBim) GameManager.getHandTimerBim().get(e.getPlayer())).getBim() == null) {
 						((TimerBim) GameManager.getHandTimerBim().get(e.getPlayer())).Throw(e.getPlayer());
 					} else {
 						TimerBim TimerBim = new TimerBim(GameManager);
@@ -275,7 +276,7 @@ public class Events implements Listener {
 						break;
 					}
 					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 6;
-					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims((byte) 0, (byte) 1));
+					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.TimerBim, (byte) 1));
 					break;
 				case FLINT:
 					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 10) {
@@ -284,7 +285,7 @@ public class Events implements Listener {
 						break;
 					}
 					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 10;
-					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims((byte) 1, (byte) 1));
+					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.CrackerBim, (byte) 1));
 					break;
 				case FIREBALL:
 					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 15) {
@@ -293,7 +294,7 @@ public class Events implements Listener {
 						break;
 					}
 					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 15;
-					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims((byte) 2, (byte) 1));
+					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.FlameBim, (byte) 1));
 					break;
 				case SLIME_BALL:
 					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 20) {
@@ -302,7 +303,7 @@ public class Events implements Listener {
 						break;
 					}
 					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 20;
-					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims((byte) 3, (byte) 1));
+					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.HomingBim, (byte) 1));
 					break;
 				case SKULL_ITEM:
 					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 30) {
@@ -311,7 +312,8 @@ public class Events implements Listener {
 						break;
 					}
 					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 30;
-					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims((byte) 4, (byte) 1));
+					e.getWhoClicked().getInventory()
+							.addItem(GameManager.getItems().bims(Bims.InstallationBim, (byte) 1));
 					break;
 				default:
 					break;

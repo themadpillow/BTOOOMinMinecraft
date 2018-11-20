@@ -11,21 +11,19 @@ import btooom.GameManager;
 
 public class HomingBim {
 	private GameManager GameManager;
-
-	Snowball bim = null;
+	private Snowball bim = null;
 
 	public HomingBim(GameManager instance) {
 		GameManager = instance;
 	}
 
 	public void Throw(Player p, Player target) {
-		if (p.getInventory().getItemInHand().getAmount() == 1) {
+		if (p.getInventory().getItemInMainHand().getAmount() == 1) {
 			p.getInventory().clear(p.getInventory().getHeldItemSlot());
 		} else {
-			p.getInventory().getItemInHand().setAmount(p.getInventory().getItemInHand().getAmount() - 1);
+			p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount() - 1);
 		}
 
-		//bim = p.launchProjectile(Snowball.class);
 		bim = (Snowball) Bukkit.getWorlds().get(0).spawnEntity(
 				p.getEyeLocation().add(p.getEyeLocation().getDirection().multiply(BimConfig.getHomingSpeed())),
 				EntityType.SNOWBALL);

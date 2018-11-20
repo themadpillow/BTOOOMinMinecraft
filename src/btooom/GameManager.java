@@ -36,6 +36,7 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.BlockIterator;
 
 import bims.BimConfig;
+import bims.Bims;
 import bims.CrackerBim;
 import bims.FlameBim;
 import bims.HomingBim;
@@ -185,9 +186,9 @@ public class GameManager extends JavaPlugin implements Listener {
 
 			p.getInventory().clear();
 			p.setGameMode(GameMode.SURVIVAL);
-			p.getInventory().setItem(0, getItems().bims((byte) 0, (byte) 1));
+			p.getInventory().setItem(0, getItems().bims(Bims.TimerBim, (byte) 1));
 			for (int i = 0; i < 9; i++) {
-				p.getInventory().addItem(getItems().bims((byte) 0, (byte) 1));
+				p.getInventory().addItem(getItems().bims(Bims.TimerBim, (byte) 1));
 			}
 			p.getInventory().setItem(8, getItems().otherItem((byte) 0));
 			getTeam().addPlayer(p);
@@ -380,7 +381,7 @@ public class GameManager extends JavaPlugin implements Listener {
 		return isStart;
 	}
 
-	public void setStart(boolean isStart) {
+	private void setStart(boolean isStart) {
 		this.isStart = isStart;
 	}
 
@@ -388,7 +389,7 @@ public class GameManager extends JavaPlugin implements Listener {
 		return board;
 	}
 
-	public void setBoard(Scoreboard board) {
+	private void setBoard(Scoreboard board) {
 		this.board = board;
 	}
 
@@ -396,23 +397,15 @@ public class GameManager extends JavaPlugin implements Listener {
 		return Items;
 	}
 
-	public void setItems(Items items) {
-		Items = items;
-	}
-
 	public HashMap<Player, Boolean> getCanThrow() {
 		return canThrow;
-	}
-
-	public void setCanThrow(HashMap<Player, Boolean> canThrow) {
-		this.canThrow = canThrow;
 	}
 
 	public int[] getMoney() {
 		return money;
 	}
 
-	public void setMoney(int money[]) {
+	private void setMoney(int money[]) {
 		this.money = money;
 	}
 
@@ -420,7 +413,7 @@ public class GameManager extends JavaPlugin implements Listener {
 		return team;
 	}
 
-	public void setTeam(Team team) {
+	private void setTeam(Team team) {
 		this.team = team;
 	}
 
@@ -428,23 +421,15 @@ public class GameManager extends JavaPlugin implements Listener {
 		return alivelist;
 	}
 
-	public void setAlivelist(List<Player> alivelist) {
-		this.alivelist = alivelist;
-	}
-
 	public HashMap<Player, Boolean> getCanBuy() {
 		return canBuy;
-	}
-
-	public void setCanBuy(HashMap<Player, Boolean> canBuy) {
-		this.canBuy = canBuy;
 	}
 
 	public Objective getInfo() {
 		return info;
 	}
 
-	public void setInfo(Objective info) {
+	private void setInfo(Objective info) {
 		this.info = info;
 	}
 }
