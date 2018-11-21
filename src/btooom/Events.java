@@ -97,7 +97,7 @@ public class Events implements Listener {
 					CrackerBim.Throw(e.getPlayer());
 					break;
 				case SLIME_BALL:
-					Player target = GameManager.getTargetedPlayer(e.getPlayer(), 30);
+					Player target = HomingBim.getTargetedPlayer(e.getPlayer(), 30);
 					if (target == null) {
 						return;
 					}

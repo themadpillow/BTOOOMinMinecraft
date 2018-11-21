@@ -15,7 +15,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -32,7 +31,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-import org.bukkit.util.BlockIterator;
 
 import bims.BimConfig;
 import bims.Bims;
@@ -242,38 +240,6 @@ public class GameManager extends JavaPlugin implements Listener {
 				continue;
 			}
 		}
-	}
-
-	public Player getTargetedPlayer(Player player, int range) {
-
-		// 視線の先にあるブロック一覧を取得する
-		BlockIterator it = new BlockIterator(player, range);
-
-		while (it.hasNext()) {
-			Block block = it.next();
-
-			if (block.getType() != Material.AIR) {
-				// ブロックが見つかった(遮られている)、処理を終わってnullを返す
-				return null;
-
-			} else {
-				// 位置が一致するPlayerがないか探す
-				for (Player target : Bukkit.getOnlinePlayers()) {
-					if (target == player
-							|| target.getGameMode() == GameMode.SPECTATOR) {
-						continue;
-					}
-					if (block.getLocation().distanceSquared(target.getLocation()) <= 3.0
-							|| block.getLocation().distanceSquared(target.getEyeLocation()) <= 3.0) {
-						// 見つかったPlayerを返す
-						return target;
-					}
-				}
-			}
-		}
-
-		// 何も見つからなかった
-		return null;
 	}
 
 	public void gameover(Player winner, boolean sixstar) {

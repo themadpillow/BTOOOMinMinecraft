@@ -1,11 +1,15 @@
 package bims;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BlockIterator;
 
 import btooom.GameManager;
 
@@ -47,5 +51,36 @@ public class HomingBim {
 				}
 			}
 		}.runTaskTimer(GameManager, 0L, 1L);
+	}
+
+	public static Player getTargetedPlayer(Player player, int range) {
+		// 視線の先にあるブロック一覧を取得する
+		BlockIterator it = new BlockIterator(player, range);
+
+		while (it.hasNext()) {
+			Block block = it.next();
+
+			if (block.getType() != Material.AIR) {
+				// ブロックが見つかった(遮られている)、処理を終わってnullを返す
+				return null;
+
+			} else {
+				// 位置が一致するPlayerがないか探す
+				for (Player target : Bukkit.getOnlinePlayers()) {
+					if (target == player
+							|| target.getGameMode() == GameMode.SPECTATOR) {
+						continue;
+					}
+					if (block.getLocation().distanceSquared(target.getLocation()) <= 3.0
+							|| block.getLocation().distanceSquared(target.getEyeLocation()) <= 3.0) {
+						// 見つかったPlayerを返す
+						return target;
+					}
+				}
+			}
+		}
+
+		// 何も見つからなかった
+		return null;
 	}
 }
