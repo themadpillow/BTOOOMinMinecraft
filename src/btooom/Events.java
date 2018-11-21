@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -27,7 +28,6 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.connorlinfoot.actionbarapi.ActionBarAPI;
 
@@ -61,13 +61,11 @@ public class Events implements Listener {
 		if (e.getItem() == null) {
 			return;
 		}
-		switch (e.getAction()) {
-		case LEFT_CLICK_AIR:
-		case LEFT_CLICK_BLOCK:
-			if (e.getItem() == null) {
-				break;
-			}
-			if (e.getItem().getType() == Material.COAL) {
+		e.setCancelled(true);
+
+		if (e.getAction() == Action.LEFT_CLICK_AIR
+				|| e.getAction() == Action.LEFT_CLICK_BLOCK) {
+			if (e.getItem().getType() == Bims.TimerBim.getMaterial()) {
 				if (GameManager.getHandTimerBim().get(e.getPlayer()) == null) {
 					TimerBim TimerBim = new TimerBim(GameManager);
 					GameManager.getHandTimerBim().put(e.getPlayer(), TimerBim);
@@ -76,14 +74,12 @@ public class Events implements Listener {
 			} else if (e.getItem().getType() == Material.COMPASS) {
 				e.getPlayer().openInventory(GameManager.getItems().getBuyBimInventory());
 			}
-			break;
-		case RIGHT_CLICK_AIR:
-		case RIGHT_CLICK_BLOCK:
+		} else if (e.getAction() == Action.RIGHT_CLICK_AIR
+				|| e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			if (GameManager.getCanThrow().get(e.getPlayer()) != null
 					&& (GameManager.getCanThrow().get(e.getPlayer())
 							|| e.getPlayer().getGameMode() == GameMode.CREATIVE)) {
-				switch (e.getItem().getType()) {
-				case COAL: // TimerBim
+				if (e.getItem().getType() == Bims.TimerBim.getMaterial()) {
 					if (GameManager.getHandTimerBim().get(e.getPlayer()) != null
 							&& ((TimerBim) GameManager.getHandTimerBim().get(e.getPlayer())).getBim() == null) {
 						((TimerBim) GameManager.getHandTimerBim().get(e.getPlayer())).Throw(e.getPlayer());
@@ -91,74 +87,55 @@ public class Events implements Listener {
 						TimerBim TimerBim = new TimerBim(GameManager);
 						TimerBim.Throw(e.getPlayer());
 					}
-					break;
-				case FLINT:
+				} else if (e.getItem().getType() == Bims.CrackerBim.getMaterial()) {
 					CrackerBim CrackerBim = new CrackerBim(GameManager);
 					CrackerBim.Throw(e.getPlayer());
-					break;
-				case SLIME_BALL:
+				} else if (e.getItem().getType() == Bims.HomingBim.getMaterial()) {
 					Player target = HomingBim.getTargetedPlayer(e.getPlayer(), 30);
 					if (target == null) {
 						return;
 					}
 					HomingBim HomingBim = new HomingBim(GameManager);
 					HomingBim.Throw(e.getPlayer(), target);
-					break;
-				case FIREBALL:
+				} else if (e.getItem().getType() == Bims.FlameBim.getMaterial()) {
 					FlameBim FlameBim = new FlameBim(GameManager);
 					FlameBim.Throw(e.getPlayer());
-					break;
-				case COMPASS:
+				} else if (e.getItem().getType() == Material.COMPASS) {
 					double distance = -1;
 					Player nearPlayer = null;
-					for (Player all : Bukkit.getOnlinePlayers()) {
-						if (all.getGameMode() == GameMode.SPECTATOR || all == e.getPlayer()) {
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						if (player.getGameMode() == GameMode.SPECTATOR
+								|| player == e.getPlayer()) {
 							continue;
 						}
-						if (distance == -1) {
-							nearPlayer = all;
-							distance = all.getLocation().distanceSquared(e.getPlayer().getLocation());
-							continue;
-						}
-						if (all.getLocation().distanceSquared(e.getPlayer().getLocation()) < distance) {
-							nearPlayer = all;
-							distance = all.getLocation().distanceSquared(e.getPlayer().getLocation());
+						if (player.getLocation().distanceSquared(e.getPlayer().getLocation()) < distance) {
+							nearPlayer = player;
+							distance = player.getLocation().distanceSquared(e.getPlayer().getLocation());
 						}
 					}
 					if (nearPlayer == null) {
 						e.getPlayer().sendMessage("誰も見つかりませんでした");
-						return;
+					} else {
+						e.getPlayer().sendMessage("" + nearPlayer.getName() + "が見つかりました");
+						e.getPlayer().setCompassTarget(nearPlayer.getLocation());
 					}
-					e.getPlayer().sendMessage("" + nearPlayer.getName() + "が見つかりました");
-					e.getPlayer().setCompassTarget(nearPlayer.getLocation());
-					distance = 0;
-					nearPlayer = null;
-					return;
-				default:
-					return;
 				}
-				e.setCancelled(true);
-				GameManager.getCanThrow().put(e.getPlayer(), false);
-				new BukkitRunnable() {
-					public void run() {
-						GameManager.getCanThrow().put(e.getPlayer(), true);
-					}
-				}.runTaskLater(GameManager, 20L);
 			}
-			break;
-		default:
-			break;
+			GameManager.getCanThrow().put(e.getPlayer(), false);
+			Bukkit.getScheduler().runTaskLater(GameManager, () -> {
+				GameManager.getCanThrow().put(e.getPlayer(), true);
+			}, 20L);
 		}
-
 	}
 
 	@EventHandler
 	public void installationBim(BlockPlaceEvent e) {
-		if (e.getBlock().getType() != Material.SKULL) {
-			if (e.getPlayer().getGameMode() != GameMode.CREATIVE)
-				e.setCancelled(true);
+		if (e.getBlock().getType() != Material.SKULL
+				&& e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+			e.setCancelled(true);
 			return;
 		}
+
 		Block block = e.getBlockPlaced();
 		InstallationBim InstallationBim = new InstallationBim(GameManager);
 		InstallationBim.set(e.getPlayer(), block);
@@ -176,8 +153,9 @@ public class Events implements Listener {
 		if (e.getEntity() instanceof Player) {
 			e.setCancelled(true);
 			((Player) e.getEntity()).damage(e.getDamage() * 0.7);
-		} else if (e.getEntity() instanceof Item)
+		} else if (e.getEntity() instanceof Item) {
 			e.setCancelled(true);
+		}
 	}
 
 	@EventHandler
@@ -185,13 +163,11 @@ public class Events implements Listener {
 		if (e.getEntity() instanceof Snowball) {
 			e.setCancelled(true);
 			if (e.getEntity().getMetadata("type") != null) {
-				switch (e.getEntity().getMetadata("type").get(0).asString()) {
-				case "crack":
+				if (e.getEntity().getMetadata("type").get(0).asString().equalsIgnoreCase("crack")) {
 					Bukkit.getWorlds().get(0).createExplosion(e.getEntity().getLocation().getX(),
 							e.getEntity().getLocation().getY(), e.getEntity().getLocation().getZ(),
 							BimConfig.getDamage(Bims.CrackerBim), false, false);
-					break;
-				default:
+				} else {
 					return;
 				}
 				e.getEntity().remove();
@@ -200,20 +176,19 @@ public class Events implements Listener {
 	}
 
 	@EventHandler
-	public void hitororHoming(ProjectileHitEvent e) {
+	public void hitCrackerorHoming(ProjectileHitEvent e) {
 		if (e.getEntity() instanceof Snowball) {
 			if (e.getEntity().getMetadata("type") != null) {
 				Location loc = e.getEntity().getLocation();
-				switch (e.getEntity().getMetadata("type").get(0).asString()) {
-				case "crack":
+
+				String type = e.getEntity().getMetadata("type").get(0).asString();
+				if (type.equals("crack")) {
 					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(),
 							BimConfig.getDamage(Bims.CrackerBim), false, false);
-					break;
-				case "homing":
+				} else if (type.equals("homing")) {
 					Bukkit.getWorlds().get(0).createExplosion(loc.getX(), loc.getY(), loc.getZ(),
 							BimConfig.getDamage(Bims.HomingBim), false, false);
-					break;
-				default:
+				} else {
 					return;
 				}
 			}
@@ -232,7 +207,7 @@ public class Events implements Listener {
 	}
 
 	@EventHandler
-	public void queit(PlayerQuitEvent e) {
+	public void quit(PlayerQuitEvent e) {
 		e.getPlayer().getInventory().clear();
 		if (GameManager.getTeam().hasPlayer(e.getPlayer())) {
 			GameManager.getTeam().removePlayer(e.getPlayer());
@@ -244,18 +219,9 @@ public class Events implements Listener {
 
 			e.getPlayer().setGameMode(GameMode.SPECTATOR);
 
-			int i = 0;
-			Player winner = null;
-			for (Player p : GameManager.getAlivelist()) {
-				if (p != null) {
-					i++;
-					if (i > 1) {
-						return;
-					}
-					winner = p;
-				}
+			if (GameManager.getAlivelist().size() == 1) {
+				GameManager.gameover(GameManager.getAlivelist().get(0), false);
 			}
-			GameManager.gameover(winner, false);
 		}
 	}
 
@@ -265,67 +231,60 @@ public class Events implements Listener {
 			return;
 		}
 		if (e.getClickedInventory().getName().contains("BIM購入")) {
-			if (e.getCurrentItem() == null) {
+			e.setCancelled(true);
+
+			if (e.getCurrentItem() == null
+					|| !GameManager.getCanBuy().get(e.getWhoClicked())) {
 				return;
 			}
-			e.setCancelled(true);
-			if (GameManager.getCanBuy().get(e.getWhoClicked())) {
-				switch (e.getCurrentItem().getType()) {
-				case COAL:
-					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 6) {
-						e.getWhoClicked().closeInventory();
-						e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
-						break;
-					}
+
+			if (e.getCurrentItem().getType() == Bims.TimerBim.getMaterial()) {
+				if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 6) {
+					e.getWhoClicked().closeInventory();
+					e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
+				} else {
 					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 6;
 					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.TimerBim, (byte) 1));
-					break;
-				case FLINT:
-					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 10) {
-						e.getWhoClicked().closeInventory();
-						e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
-						break;
-					}
+				}
+			} else if (e.getCurrentItem().getType() == Bims.CrackerBim.getMaterial()) {
+				if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 10) {
+					e.getWhoClicked().closeInventory();
+					e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
+				} else {
 					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 10;
-					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.CrackerBim, (byte) 1));
-					break;
-				case FIREBALL:
-					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 15) {
-						e.getWhoClicked().closeInventory();
-						e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
-						break;
-					}
+					e.getWhoClicked().getInventory()
+							.addItem(GameManager.getItems().bims(Bims.CrackerBim, (byte) 1));
+				}
+			} else if (e.getCurrentItem().getType() == Bims.FlameBim.getMaterial()) {
+				if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 15) {
+					e.getWhoClicked().closeInventory();
+					e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
+				} else {
 					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 15;
 					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.FlameBim, (byte) 1));
-					break;
-				case SLIME_BALL:
-					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 20) {
-						e.getWhoClicked().closeInventory();
-						e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
-						break;
-					}
+				}
+			} else if (e.getCurrentItem().getType() == Bims.HomingBim.getMaterial()) {
+				if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 20) {
+					e.getWhoClicked().closeInventory();
+					e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
+				} else {
 					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 20;
 					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.HomingBim, (byte) 1));
-					break;
-				case SKULL_ITEM:
-					if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 30) {
-						e.getWhoClicked().closeInventory();
-						e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
-						break;
-					}
+				}
+			} else if (e.getCurrentItem().getType() == Bims.InstallationBim.getMaterial()) {
+				if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 30) {
+					e.getWhoClicked().closeInventory();
+					e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
+				} else {
 					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 30;
 					e.getWhoClicked().getInventory()
 							.addItem(GameManager.getItems().bims(Bims.InstallationBim, (byte) 1));
-					break;
-				default:
-					break;
 				}
+
 				GameManager.getCanBuy().put((Player) e.getWhoClicked(), false);
-				new BukkitRunnable() {
-					public void run() {
-						GameManager.getCanBuy().put((Player) e.getWhoClicked(), true);
-					}
-				}.runTaskLater(GameManager, 3L);
+				Bukkit.getScheduler().runTaskLater(GameManager, () -> {
+					GameManager.getCanBuy().put((Player) e.getWhoClicked(), true);
+				}, 3L);
 			}
 		}
 	}
@@ -363,8 +322,9 @@ public class Events implements Listener {
 	@EventHandler
 	public void pickup(PlayerPickupItemEvent e) {
 		if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-			if (e.getItem().getMetadata("nopickup").size() != 0)
+			if (e.getItem().getMetadata("nopickup").size() != 0) {
 				e.setCancelled(true);
+			}
 		}
 		/*
 		 * if (e.getItem().getItemStack().getType() == Material.COMPASS) { new

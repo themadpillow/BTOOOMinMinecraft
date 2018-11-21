@@ -26,12 +26,10 @@ public class Items {
 	}
 
 	public ItemStack bims(Bims bims, byte type) {
-		ItemStack item = null;
-		ItemMeta meta = null;
+		ItemStack item = new ItemStack(bims.getMaterial());
+		ItemMeta meta = item.getItemMeta();
 		ArrayList<String> lores = new ArrayList<String>();
 		if (bims == Bims.TimerBim) {
-			item = new ItemStack(Material.COAL);
-			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.RED + "§lタイマーBIM");
 			if (type == 0) {
 				lores.add("6 yen");
@@ -41,8 +39,6 @@ public class Items {
 				lores.add("起爆カウント： 5sec");
 			}
 		} else if (bims == Bims.CrackerBim) {
-			item = new ItemStack(Material.FLINT);
-			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.BLUE + "§lクラッカーBIM");
 			if (type == 0) {
 				lores.add("10 yen");
@@ -51,9 +47,7 @@ public class Items {
 				lores.add("ブロックやプレイヤーに当たった瞬間爆発する");
 			}
 		} else if (bims == Bims.FlameBim) {
-			item = new ItemStack(Material.FIREBALL);
-			meta = item.getItemMeta();
-			meta.setDisplayName(ChatColor.DARK_RED + "フレイムBIM");
+			meta.setDisplayName(ChatColor.DARK_RED + "§lフレイムBIM");
 			if (type == 0) {
 				lores.add("15 yen");
 			} else {
@@ -61,8 +55,6 @@ public class Items {
 				lores.add("着弾地点から十字に火を放つ");
 			}
 		} else if (bims == Bims.HomingBim) {
-			item = new ItemStack(Material.SLIME_BALL);
-			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.LIGHT_PURPLE + "§lホーミングBIM");
 			if (type == 0) {
 				lores.add("20 yen");
@@ -72,7 +64,7 @@ public class Items {
 				lores.add("ブロックやプレイヤーにぶつかった瞬間爆発する");
 			}
 		} else if (bims == Bims.InstallationBim) {
-			item = new ItemStack(Material.SKULL_ITEM, 1, (short) 3, (byte) SkullType.PLAYER.ordinal());
+			item = new ItemStack(bims.getMaterial(), 1, (short) 3, (byte) SkullType.PLAYER.ordinal());
 			SkullMeta skullmeta = (SkullMeta) item.getItemMeta();
 			skullmeta.setOwner("MHF_TNT");
 			skullmeta.setDisplayName(ChatColor.GREEN + "§l設置BIM");

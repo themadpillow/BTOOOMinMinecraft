@@ -63,7 +63,7 @@ public class GameManager extends JavaPlugin implements Listener {
 
 	private List<Player> alivelist = new ArrayList<Player>();
 
-	private static final String header = ChatColor.GREEN + "§l[BTOOOM] ";
+	private static final String header = ChatColor.GREEN + "§l[BTOOOM] " + ChatColor.RESET;
 
 	public void onEnable() {
 		TitleSender = new TitleSender();

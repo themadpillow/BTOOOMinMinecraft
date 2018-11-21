@@ -5,8 +5,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import other.CustomConfig;
 
 public class BimConfig {
-	private CustomConfig configuration;
-
 	private static float defaultThrowRange;
 	private static float runThrowRange;
 	private static float shiftThrowRange;
@@ -20,11 +18,10 @@ public class BimConfig {
 	private static float installationRange;
 
 	public BimConfig(CustomConfig config) {
-		configuration = config;
-		init();
+		init(config);
 	}
 
-	private void init() {
+	private void init(CustomConfig configuration) {
 		FileConfiguration config = configuration.getConfig();
 
 		defaultThrowRange = (float) config.getDouble("ThrowRange.default");
