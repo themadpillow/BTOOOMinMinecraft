@@ -64,16 +64,17 @@ public class Events implements Listener {
 		switch (e.getAction()) {
 		case LEFT_CLICK_AIR:
 		case LEFT_CLICK_BLOCK:
-			switch (e.getItem().getType()) {
-			case COAL: // TimerBim
+			if (e.getItem() == null) {
+				break;
+			}
+			if (e.getItem().getType() == Material.COAL) {
 				if (GameManager.getHandTimerBim().get(e.getPlayer()) == null) {
 					TimerBim TimerBim = new TimerBim(GameManager);
 					GameManager.getHandTimerBim().put(e.getPlayer(), TimerBim);
 					TimerBim.count(e.getPlayer());
 				}
-				break;
-			default:
-				break;
+			} else if (e.getItem().getType() == Material.COMPASS) {
+				e.getPlayer().openInventory(GameManager.getItems().getBuyBimInventory());
 			}
 			break;
 		case RIGHT_CLICK_AIR:
@@ -148,6 +149,7 @@ public class Events implements Listener {
 		default:
 			break;
 		}
+
 	}
 
 	@EventHandler
