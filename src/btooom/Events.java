@@ -337,6 +337,7 @@ public class Events implements Listener {
 		e.setDeathMessage(GameManager.getHeader() + ChatColor.RED + e.getEntity().getName() + "さんが死亡しました");
 
 		Bukkit.getScheduler().runTaskLater(GameManager, () -> {
+			e.getEntity().getInventory().clear();
 			e.getEntity().setBedSpawnLocation(e.getEntity().getLocation(), true);
 			e.getEntity().spigot().respawn();
 			e.getEntity().setGameMode(GameMode.SPECTATOR);
