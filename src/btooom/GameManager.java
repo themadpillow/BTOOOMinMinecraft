@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -228,26 +227,19 @@ public class GameManager extends JavaPlugin implements Listener {
 	public Location respawn() {
 		int range = Integer.parseInt((String) config.get("WorldRange"));
 		Location loc = (Location) config.get("CenterLocation");
-		Random ran = new Random();
-		int x = ran.nextInt((int) (range / 2));
-		int z = ran.nextInt((int) (range / 2));
-		if (ran.nextInt(2) == 0) {
-			x = -x;
-		}
-		if (ran.nextInt(2) == 0) {
-			z = -z;
-		}
+
 		for (int y = 0;; y++) {
+			double x = (Math.random() * range) - (range / 2);
+			double z = (Math.random() * range) - (range / 2);
+
 			Location reloc = loc.clone().add(x, y, z);
-			if (reloc.getBlock().getType() == Material.STATIONARY_WATER
-					|| reloc.getBlock().getType() == Material.WATER
-					|| reloc.getBlock().getType() == Material.WATER_LILY) {
-				x = ran.nextInt(range / 2);
-				z = ran.nextInt(range / 2);
-				continue;
-			}
-			if (reloc.getBlock().getType() == Material.AIR) {
+			if (reloc.getBlock().getType() == Material.AIR
+					&& reloc.clone().add(0, -1, 0).getBlock().getType() != Material.WATER
+					&& reloc.clone().add(0, -1, 0).getBlock().getType() != Material.WATER_LILY
+					&& reloc.clone().add(0, -1, 0).getBlock().getType() != Material.STATIONARY_WATER) {
 				return reloc;
+			} else {
+				continue;
 			}
 		}
 	}
