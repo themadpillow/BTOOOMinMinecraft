@@ -77,6 +77,12 @@ public class GameManager extends JavaPlugin implements Listener {
 			config.set("Timer", true);
 			this.saveConfig();
 		}
+		if (config.get("spawnMinHeight") == null) {
+			config.set("spawnMaxHeight", -10);
+		}
+		if (config.get("spawnMaxHeight") == null) {
+			config.set("spawnMaxHeight", 10);
+		}
 
 		getItems().setBuyBimInventory();
 
@@ -186,7 +192,7 @@ public class GameManager extends JavaPlugin implements Listener {
 			p.getInventory().setItem(8, getItems().otherItem((byte) 0));
 			getTeam().addPlayer(p);
 			p.teleport(respawn());
-			
+
 			setMoney(p, 30);
 		}
 
@@ -208,7 +214,7 @@ public class GameManager extends JavaPlugin implements Listener {
 			for (Player p : Bukkit.getOnlinePlayers()) {
 				getCanThrow().put(p, true);
 				p.playSound(p.getLocation().add(0, 5, 0), Sound.ENTITY_FIREWORK_LARGE_BLAST, 1F, 1F);
-				TitleSender.sendTitle(p, ChatColor.GREEN + "§lマイクラBTOOOM", ChatColor.RED+ "§lSTART");
+				TitleSender.sendTitle(p, ChatColor.GREEN + "§lマイクラBTOOOM", ChatColor.RED + "§lSTART;");
 			}
 		}, 380);
 		Bukkit.getScheduler().runTaskLater(this, () -> {
@@ -222,12 +228,13 @@ public class GameManager extends JavaPlugin implements Listener {
 		int range = Integer.parseInt((String) config.get("WorldRange"));
 		Location loc = (Location) config.get("CenterLocation");
 
-		for (int y = 0;; y++) {
+		for (int y = loc.getBlockY() + config.getInt("spawnMinHeight"); y < config.getInt("spawnMaxHeight"); y++) {
 			double x = (Math.random() * range) - (range / 2);
 			double z = (Math.random() * range) - (range / 2);
 
 			Location reloc = loc.clone().add(x, y, z);
-			if (reloc.getBlock().getType() == Material.AIR
+			if (reloc.clone().getBlock().getType() == Material.AIR
+					&& reloc.clone().add(0, 1, 0).getBlock().getType() == Material.AIR
 					&& reloc.clone().add(0, -1, 0).getBlock().getType() != Material.WATER
 					&& reloc.clone().add(0, -1, 0).getBlock().getType() != Material.WATER_LILY
 					&& reloc.clone().add(0, -1, 0).getBlock().getType() != Material.STATIONARY_WATER) {
@@ -236,6 +243,8 @@ public class GameManager extends JavaPlugin implements Listener {
 				continue;
 			}
 		}
+
+		return respawn();
 	}
 
 	public void gameover(Player winner, boolean sixstar) {
@@ -363,10 +372,10 @@ public class GameManager extends JavaPlugin implements Listener {
 		}
 	}
 
-	private void setMoney(Player player , int money) {
+	private void setMoney(Player player, int money) {
 		player.setMetadata("money", new FixedMetadataValue(this, money));
 	}
-	
+
 	public void addMoney(Player player, int addMoney) {
 		setMoney(player, getMoney(player) + 5);
 	}
