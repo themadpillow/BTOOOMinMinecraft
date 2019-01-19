@@ -201,7 +201,7 @@ public class Events implements Listener {
 		if (e.getPlayer().getInventory().getItem(e.getNewSlot()) != null
 				&& e.getPlayer().getInventory().getItem(e.getNewSlot()).getType() == Material.COMPASS) {
 			ActionBarAPI.sendActionBar(e.getPlayer(),
-					"所持金：" + GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getPlayer())]);
+					"所持金：" + GameManager.getMoney(e.getPlayer()));
 		}
 		GameManager.getHandTimerBim().put(e.getPlayer(), null);
 	}
@@ -238,45 +238,46 @@ public class Events implements Listener {
 				return;
 			}
 
+			Player player = (Player) e.getWhoClicked();
 			if (e.getCurrentItem().getType() == Bims.TimerBim.getMaterial()) {
-				if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 6) {
+				if (GameManager.getMoney(player) < BimConfig.getPrice(Bims.TimerBim)) {
 					e.getWhoClicked().closeInventory();
 					e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
 				} else {
-					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 6;
+					GameManager.addMoney(player, -BimConfig.getPrice(Bims.TimerBim));
 					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.TimerBim, (byte) 1));
 				}
 			} else if (e.getCurrentItem().getType() == Bims.CrackerBim.getMaterial()) {
-				if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 10) {
+				if (GameManager.getMoney(player) < BimConfig.getPrice(Bims.CrackerBim)) {
 					e.getWhoClicked().closeInventory();
 					e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
 				} else {
-					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 10;
+					GameManager.addMoney(player, -BimConfig.getPrice(Bims.CrackerBim));
 					e.getWhoClicked().getInventory()
 							.addItem(GameManager.getItems().bims(Bims.CrackerBim, (byte) 1));
 				}
 			} else if (e.getCurrentItem().getType() == Bims.FlameBim.getMaterial()) {
-				if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 15) {
+				if (GameManager.getMoney(player) < BimConfig.getPrice(Bims.FlameBim)) {
 					e.getWhoClicked().closeInventory();
 					e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
 				} else {
-					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 15;
+					GameManager.addMoney(player, -BimConfig.getPrice(Bims.FlameBim));
 					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.FlameBim, (byte) 1));
 				}
 			} else if (e.getCurrentItem().getType() == Bims.HomingBim.getMaterial()) {
-				if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 20) {
+				if (GameManager.getMoney(player) < BimConfig.getPrice(Bims.HomingBim)) {
 					e.getWhoClicked().closeInventory();
 					e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
 				} else {
-					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 20;
+					GameManager.addMoney(player, -BimConfig.getPrice(Bims.HomingBim));
 					e.getWhoClicked().getInventory().addItem(GameManager.getItems().bims(Bims.HomingBim, (byte) 1));
 				}
 			} else if (e.getCurrentItem().getType() == Bims.InstallationBim.getMaterial()) {
-				if (GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] < 30) {
+				if (GameManager.getMoney(player) < BimConfig.getPrice(Bims.InstallationBim)) {
 					e.getWhoClicked().closeInventory();
 					e.getWhoClicked().sendMessage(GameManager.getHeader() + ChatColor.LIGHT_PURPLE + "所持金が足りません");
 				} else {
-					GameManager.getMoney()[GameManager.getAlivelist().indexOf(e.getWhoClicked())] -= 30;
+					GameManager.addMoney(player, -BimConfig.getPrice(Bims.InstallationBim));
 					e.getWhoClicked().getInventory()
 							.addItem(GameManager.getItems().bims(Bims.InstallationBim, (byte) 1));
 				}

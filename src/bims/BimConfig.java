@@ -17,6 +17,12 @@ public class BimConfig {
 	private static float homingSpeed;
 	private static float installationRange;
 
+	private static int timerBimPrice;
+	private static int crackBimPrice;
+	private static int flameBimPrice;
+	private static int homingBimPrice;
+	private static int installationBimPrice;
+
 	public BimConfig(CustomConfig config) {
 		init(config);
 	}
@@ -35,6 +41,13 @@ public class BimConfig {
 
 		homingSpeed = (float) config.getDouble("Bims.HomingBim.speed");
 		installationRange = (float) config.getDouble("Bims.InstallationBim.range");
+
+		timerBimPrice = config.getInt("Bims.TimerBim.price");
+		crackBimPrice = config.getInt("Bims.CrackerBim.price");
+		flameBimPrice = config.getInt("Bims.FlameBim.price");
+		homingBimPrice = config.getInt("Bims.HomingBim.price");
+		installationBimPrice = config.getInt("Bims.InstallationBim.price");
+
 	}
 
 	public static float getDamage(Bims bim) {
@@ -68,6 +81,23 @@ public class BimConfig {
 			return shiftThrowRange;
 		} else {
 			throw new RuntimeException("不明なStatusが指定されました");
+		}
+	}
+
+	public static int getPrice(Bims bims) {
+		switch (bims) {
+		case TimerBim:
+			return timerBimPrice;
+		case CrackerBim:
+			return crackBimPrice;
+		case FlameBim:
+			return flameBimPrice;
+		case HomingBim:
+			return homingBimPrice;
+		case InstallationBim:
+			return installationBimPrice;
+		default:
+			throw new RuntimeException("不明なBimが指定されました");
 		}
 	}
 }

@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -53,8 +53,6 @@ public class GameManager extends JavaPlugin implements Listener {
 
 	private HashMap<Player, Boolean> canThrow = new HashMap<Player, Boolean>();
 	private HashMap<Player, Boolean> canBuy = new HashMap<Player, Boolean>();
-
-	private int money[];
 
 	private boolean isStart = false;
 	private Scoreboard board = null;
@@ -154,14 +152,12 @@ public class GameManager extends JavaPlugin implements Listener {
 					fos.write(buf, 0, i);
 				}
 			} catch (IOException e) {
-				// TODO 自動生成された catch ブロック
 				e.printStackTrace();
 			} finally {
 				try {
 					fis.close();
 					fos.close();
 				} catch (IOException e) {
-					// TODO 自動生成された catch ブロック
 					e.printStackTrace();
 				}
 			}
@@ -190,14 +186,14 @@ public class GameManager extends JavaPlugin implements Listener {
 			p.getInventory().setItem(8, getItems().otherItem((byte) 0));
 			getTeam().addPlayer(p);
 			p.teleport(respawn());
+			
+			setMoney(p, 30);
 		}
 
-		setMoney(new int[getAlivelist().size()]);
-		Arrays.fill(getMoney(), 30);
 		new BukkitRunnable() {
 			public void run() {
-				for (int i = 0; i < getMoney().length; i++) {
-					getMoney()[i] += 5;
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					addMoney(player, 5);
 				}
 			}
 		}.runTaskTimer(this, 100L, 100L);
@@ -359,12 +355,20 @@ public class GameManager extends JavaPlugin implements Listener {
 		return canThrow;
 	}
 
-	public int[] getMoney() {
-		return money;
+	public int getMoney(Player player) {
+		if (!player.getMetadata("money").isEmpty()) {
+			return player.getMetadata("money").get(0).asInt();
+		} else {
+			return -1;
+		}
 	}
 
-	private void setMoney(int money[]) {
-		this.money = money;
+	private void setMoney(Player player , int money) {
+		player.setMetadata("money", new FixedMetadataValue(this, money));
+	}
+	
+	public void addMoney(Player player, int addMoney) {
+		setMoney(player, getMoney(player) + 5);
 	}
 
 	public Team getTeam() {
