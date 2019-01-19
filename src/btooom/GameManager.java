@@ -208,7 +208,7 @@ public class GameManager extends JavaPlugin implements Listener {
 			for (Player p : Bukkit.getOnlinePlayers()) {
 				getCanThrow().put(p, true);
 				p.playSound(p.getLocation().add(0, 5, 0), Sound.ENTITY_FIREWORK_LARGE_BLAST, 1F, 1F);
-				TitleSender.sendTitle(p, ChatColor.GREEN + "§lBTOOOM !", "");
+				TitleSender.sendTitle(p, ChatColor.GREEN + "§lマイクラBTOOOM", ChatColor.RED+ "§lSTART");
 			}
 		}, 380);
 		Bukkit.getScheduler().runTaskLater(this, () -> {
