@@ -61,7 +61,9 @@ public class Commands implements CommandExecutor {
 			return false;
 		}
 		if (cmd.getName().equalsIgnoreCase("spawn")) {
-			if ((GameManager.getBoard().getPlayerTeam((Player) sender)) == null) {
+			Player player = (Player) sender;
+
+			if ((player.getScoreboard().getPlayerTeam(player)) == null) {
 				sender.sendMessage(GameManager.getHeader() + ChatColor.RED + "準備時間中のみ使用可能です");
 				return true;
 			}
@@ -69,8 +71,8 @@ public class Commands implements CommandExecutor {
 				sender.sendMessage(GameManager.getHeader() + ChatColor.RED + "準備時間中のみ使用可能です");
 				return true;
 			}
-			((Player) sender).teleport(GameManager.respawn());
-			sender.sendMessage(GameManager.getHeader() + ChatColor.RED + "リスポーンしました");
+			player.teleport(GameManager.respawn());
+			player.sendMessage(GameManager.getHeader() + ChatColor.RED + "リスポーンしました");
 			return true;
 		}
 		if (cmd.getName().equalsIgnoreCase("s") || cmd.getName().equalsIgnoreCase("shop")) {

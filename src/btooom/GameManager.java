@@ -29,8 +29,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import bims.BimConfig;
 import bims.Bims;
@@ -55,9 +53,6 @@ public class GameManager extends JavaPlugin implements Listener {
 	private HashMap<Player, Boolean> canBuy = new HashMap<Player, Boolean>();
 
 	private boolean isStart = false;
-	private Scoreboard board = null;
-	private Team team = null;
-	private Objective info = null;
 
 	private List<Player> alivelist = new ArrayList<Player>();
 
@@ -86,26 +81,24 @@ public class GameManager extends JavaPlugin implements Listener {
 
 		getItems().setBuyBimInventory();
 
-		setBoard(Bukkit.getScoreboardManager().getMainScoreboard());
-		if (getBoard().getTeam("team") == null) {
-			setTeam(getBoard().registerNewTeam("team"));
-		} else {
-			setTeam(getBoard().getTeam("team"));
-		}
-
-		getTeam().setAllowFriendlyFire(true);
-		getTeam().setNameTagVisibility(NameTagVisibility.HIDE_FOR_OWN_TEAM);
-
-		if ((boolean) config.get("Timer")) {
-			if (getBoard().getObjective(ChatColor.DARK_GREEN + "BTOOOM!") == null)
-				setInfo(getBoard().registerNewObjective(ChatColor.DARK_GREEN + "BTOOOM!", "info"));
-			else {
-				setInfo(getBoard().getObjective(ChatColor.DARK_GREEN + "BTOOOM!"));
+		for(Player player : Bukkit.getOnlinePlayers()) {
+			player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+			if (player.getScoreboard().getTeam("team") == null) {
+				player.getScoreboard().registerNewTeam("team");
 			}
-			getInfo().setDisplaySlot(DisplaySlot.SIDEBAR);
+			player.getScoreboard().getTeam("team").setAllowFriendlyFire(true);
+			player.getScoreboard().getTeam("team").setNameTagVisibility(NameTagVisibility.HIDE_FOR_OTHER_TEAMS);
 
-			Score score = getInfo().getScore("試合開始前です");
-			score.setScore(0);
+			if ((boolean) config.get("Timer")) {
+				Objective objective;
+				if ((objective = player.getScoreboard().getObjective(ChatColor.DARK_GREEN + "BTOOOM!")) == null) {
+					objective = player.getScoreboard().registerNewObjective(ChatColor.DARK_GREEN + "BTOOOM!", "info");
+				}
+				objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+				Score score = objective.getScore("試合開始前です");
+				score.setScore(0);
+			}
 		}
 
 		Commands Commands = new Commands(this);
@@ -136,11 +129,9 @@ public class GameManager extends JavaPlugin implements Listener {
 	}
 
 	public void onDisable() {
-		if (getInfo() != null) {
-			getInfo().unregister();
-		}
-		if (getTeam() != null) {
-			getTeam().unregister();
+		for(Player player : Bukkit.getOnlinePlayers()) {
+			player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
+			player.getScoreboard().getTeam("team").unregister();
 		}
 	}
 
@@ -179,6 +170,8 @@ public class GameManager extends JavaPlugin implements Listener {
 		}
 
 		for (Player p : Bukkit.getOnlinePlayers()) {
+			p.setDisplayName("");
+			
 			getAlivelist().add(p);
 			getCanThrow().put(p, false);
 			getCanBuy().put(p, true);
@@ -190,7 +183,7 @@ public class GameManager extends JavaPlugin implements Listener {
 				p.getInventory().addItem(getItems().bims(Bims.TimerBim, (byte) 1));
 			}
 			p.getInventory().setItem(8, getItems().otherItem((byte) 0));
-			getTeam().addPlayer(p);
+			p.getScoreboard().getTeam("team").addPlayer(p);
 			p.teleport(respawn());
 
 			setMoney(p, 30);
@@ -248,7 +241,9 @@ public class GameManager extends JavaPlugin implements Listener {
 	}
 
 	public void gameover(Player winner, boolean sixstar) {
-
+		for(Player player : Bukkit.getOnlinePlayers()) {
+			player.setDisplayName(player.getName());
+		}
 		if ((boolean) config.get("Timer")) {
 			Timer.getTimerTaskID().cancel();
 		}
@@ -348,14 +343,6 @@ public class GameManager extends JavaPlugin implements Listener {
 		this.isStart = isStart;
 	}
 
-	public Scoreboard getBoard() {
-		return board;
-	}
-
-	private void setBoard(Scoreboard board) {
-		this.board = board;
-	}
-
 	public Items getItems() {
 		return Items;
 	}
@@ -379,28 +366,12 @@ public class GameManager extends JavaPlugin implements Listener {
 	public void addMoney(Player player, int addMoney) {
 		setMoney(player, getMoney(player) + 5);
 	}
-
-	public Team getTeam() {
-		return team;
-	}
-
-	private void setTeam(Team team) {
-		this.team = team;
-	}
-
+	
 	public List<Player> getAlivelist() {
 		return alivelist;
 	}
 
 	public HashMap<Player, Boolean> getCanBuy() {
 		return canBuy;
-	}
-
-	public Objective getInfo() {
-		return info;
-	}
-
-	private void setInfo(Objective info) {
-		this.info = info;
 	}
 }

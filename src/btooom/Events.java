@@ -28,6 +28,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scoreboard.DisplaySlot;
 
 import com.connorlinfoot.actionbarapi.ActionBarAPI;
 
@@ -209,8 +210,10 @@ public class Events implements Listener {
 	@EventHandler
 	public void quit(PlayerQuitEvent e) {
 		e.getPlayer().getInventory().clear();
-		if (GameManager.getTeam().hasPlayer(e.getPlayer())) {
-			GameManager.getTeam().removePlayer(e.getPlayer());
+
+		if (e.getPlayer().getScoreboard() != null) {
+			e.getPlayer().getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
+			e.getPlayer().getScoreboard().getTeam("team").unregister();
 		}
 		if (GameManager.isStart()) {
 			GameManager.getAlivelist().remove(e.getPlayer());
@@ -292,7 +295,9 @@ public class Events implements Listener {
 
 	@EventHandler
 	public void Death(PlayerDeathEvent e) {
-		GameManager.getTeam().removePlayer(e.getEntity());
+		if(e.getEntity().getScoreboard() != null) {
+			e.getEntity().getScoreboard().getTeam("team").unregister();
+		}
 		GameManager.getAlivelist().remove(e.getEntity());
 		e.setDeathMessage(GameManager.getHeader() + ChatColor.RED + e.getEntity().getName() + "さんが死亡しました");
 
