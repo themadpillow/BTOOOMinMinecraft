@@ -76,7 +76,7 @@ public class Timer {
 						Score timer = player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(s);
 						timer.setScore(0);
 						
-						Score money = player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(ChatColor.GOLD + "§l所持金");
+						Score money = player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(ChatColor.GOLD + "§l    所持金");
 						money.setScore(GameManager.getMoney(player));
 					}
 				}

@@ -70,18 +70,20 @@ public class GameManager extends JavaPlugin implements Listener {
 
 		if (config.get("Timer") == null) {
 			config.set("Timer", true);
-			this.saveConfig();
+			saveConfig();
 		}
 		if (config.get("spawnMinHeight") == null) {
-			config.set("spawnMaxHeight", -10);
+			config.set("spawnMinHeight", -10);
+			saveConfig();
 		}
 		if (config.get("spawnMaxHeight") == null) {
 			config.set("spawnMaxHeight", 10);
+			saveConfig();
 		}
 
 		getItems().setBuyBimInventory();
 
-		for(Player player : Bukkit.getOnlinePlayers()) {
+		for (Player player : Bukkit.getOnlinePlayers()) {
 			player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 			if (player.getScoreboard().getTeam("team") == null) {
 				player.getScoreboard().registerNewTeam("team");
@@ -129,9 +131,11 @@ public class GameManager extends JavaPlugin implements Listener {
 	}
 
 	public void onDisable() {
-		for(Player player : Bukkit.getOnlinePlayers()) {
-			player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
-			player.getScoreboard().getTeam("team").unregister();
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.getScoreboard() != null) {
+				player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
+				player.getScoreboard().getTeam("team").unregister();
+			}
 		}
 	}
 
@@ -171,7 +175,7 @@ public class GameManager extends JavaPlugin implements Listener {
 
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			p.setDisplayName("");
-			
+
 			getAlivelist().add(p);
 			getCanThrow().put(p, false);
 			getCanBuy().put(p, true);
@@ -207,7 +211,7 @@ public class GameManager extends JavaPlugin implements Listener {
 			for (Player p : Bukkit.getOnlinePlayers()) {
 				getCanThrow().put(p, true);
 				p.playSound(p.getLocation().add(0, 5, 0), Sound.ENTITY_FIREWORK_LARGE_BLAST, 1F, 1F);
-				TitleSender.sendTitle(p, ChatColor.GREEN + "§lマイクラBTOOOM", ChatColor.RED + "§lSTART;");
+				TitleSender.sendTitle(p, ChatColor.GREEN + "§lマイクラBTOOOM", ChatColor.RED + "§lSTART");
 			}
 		}, 380);
 		Bukkit.getScheduler().runTaskLater(this, () -> {
@@ -221,9 +225,14 @@ public class GameManager extends JavaPlugin implements Listener {
 		int range = Integer.parseInt((String) config.get("WorldRange"));
 		Location loc = (Location) config.get("CenterLocation");
 
-		for (int y = loc.getBlockY() + config.getInt("spawnMinHeight"); y < config.getInt("spawnMaxHeight"); y++) {
-			double x = (Math.random() * range) - (range / 2);
-			double z = (Math.random() * range) - (range / 2);
+		double x = (Math.random() * range) - (range / 2);
+		double z = (Math.random() * range) - (range / 2);
+		for (int y = loc.getBlockY() + config.getInt("spawnMinHeight"); ; y++) {
+			if( y > config.getInt("spawnMaxHeight")) {
+				y = loc.getBlockY() + config.getInt("spawnMinHeight");
+				x = (Math.random() * range) - (range / 2);
+				z = (Math.random() * range) - (range / 2);
+			}
 
 			Location reloc = loc.clone().add(x, y, z);
 			if (reloc.clone().getBlock().getType() == Material.AIR
@@ -236,12 +245,10 @@ public class GameManager extends JavaPlugin implements Listener {
 				continue;
 			}
 		}
-
-		return respawn();
 	}
 
 	public void gameover(Player winner, boolean sixstar) {
-		for(Player player : Bukkit.getOnlinePlayers()) {
+		for (Player player : Bukkit.getOnlinePlayers()) {
 			player.setDisplayName(player.getName());
 		}
 		if ((boolean) config.get("Timer")) {
@@ -366,7 +373,7 @@ public class GameManager extends JavaPlugin implements Listener {
 	public void addMoney(Player player, int addMoney) {
 		setMoney(player, getMoney(player) + 5);
 	}
-	
+
 	public List<Player> getAlivelist() {
 		return alivelist;
 	}
