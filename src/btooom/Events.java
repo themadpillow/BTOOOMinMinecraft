@@ -30,8 +30,6 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.DisplaySlot;
 
-import com.connorlinfoot.actionbarapi.ActionBarAPI;
-
 import bims.BimConfig;
 import bims.Bims;
 import bims.CrackerBim;
@@ -109,7 +107,7 @@ public class Events implements Listener {
 								|| player == e.getPlayer()) {
 							continue;
 						}
-						if (player.getLocation().distanceSquared(e.getPlayer().getLocation()) < distance) {
+						if (distance == -1 || player.getLocation().distanceSquared(e.getPlayer().getLocation()) < distance) {
 							nearPlayer = player;
 							distance = player.getLocation().distanceSquared(e.getPlayer().getLocation());
 						}
@@ -119,6 +117,8 @@ public class Events implements Listener {
 					} else {
 						e.getPlayer().sendMessage("" + nearPlayer.getName() + "が見つかりました");
 						e.getPlayer().setCompassTarget(nearPlayer.getLocation());
+						e.getPlayer().updateInventory();
+						e.getPlayer().sendMessage(""+e.getPlayer().getCompassTarget());
 					}
 				}
 			}
@@ -199,11 +199,6 @@ public class Events implements Listener {
 
 	@EventHandler
 	public void itemheld(PlayerItemHeldEvent e) {
-		if (e.getPlayer().getInventory().getItem(e.getNewSlot()) != null
-				&& e.getPlayer().getInventory().getItem(e.getNewSlot()).getType() == Material.COMPASS) {
-			ActionBarAPI.sendActionBar(e.getPlayer(),
-					"所持金：" + GameManager.getMoney(e.getPlayer()));
-		}
 		GameManager.getHandTimerBim().put(e.getPlayer(), null);
 	}
 
@@ -213,7 +208,6 @@ public class Events implements Listener {
 
 		if (e.getPlayer().getScoreboard() != null) {
 			e.getPlayer().getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
-			e.getPlayer().getScoreboard().getTeam("team").unregister();
 		}
 		if (GameManager.isStart()) {
 			GameManager.getAlivelist().remove(e.getPlayer());
@@ -295,9 +289,6 @@ public class Events implements Listener {
 
 	@EventHandler
 	public void Death(PlayerDeathEvent e) {
-		if(e.getEntity().getScoreboard() != null) {
-			e.getEntity().getScoreboard().getTeam("team").unregister();
-		}
 		GameManager.getAlivelist().remove(e.getEntity());
 		e.setDeathMessage(GameManager.getHeader() + ChatColor.RED + e.getEntity().getName() + "さんが死亡しました");
 
@@ -313,11 +304,6 @@ public class Events implements Listener {
 		}
 	}
 
-	/*
-	 * @EventHandler public void CantHalfClick(InventoryClickEvent e){
-	 * if(e.getAction() == InventoryAction.PICKUP_HALF){ e.setCancelled(true); }
-	 * }
-	 */
 	@EventHandler
 	public void drop(PlayerDropItemEvent e) {
 		if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {

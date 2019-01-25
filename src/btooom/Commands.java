@@ -63,10 +63,6 @@ public class Commands implements CommandExecutor {
 		if (cmd.getName().equalsIgnoreCase("spawn")) {
 			Player player = (Player) sender;
 
-			if ((player.getScoreboard().getPlayerTeam(player)) == null) {
-				sender.sendMessage(GameManager.getHeader() + ChatColor.RED + "準備時間中のみ使用可能です");
-				return true;
-			}
 			if (GameManager.isStart()) {
 				sender.sendMessage(GameManager.getHeader() + ChatColor.RED + "準備時間中のみ使用可能です");
 				return true;

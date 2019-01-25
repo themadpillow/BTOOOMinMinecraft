@@ -47,7 +47,6 @@ public class BimConfig {
 		flameBimPrice = config.getInt("Bims.FlameBim.price");
 		homingBimPrice = config.getInt("Bims.HomingBim.price");
 		installationBimPrice = config.getInt("Bims.InstallationBim.price");
-
 	}
 
 	public static float getDamage(Bims bim) {

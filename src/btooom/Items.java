@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import bims.BimConfig;
 import bims.Bims;
 import net.md_5.bungee.api.ChatColor;
 
@@ -32,7 +33,7 @@ public class Items {
 		if (bims == Bims.TimerBim) {
 			meta.setDisplayName(ChatColor.RED + "§lタイマーBIM");
 			if (type == 0) {
-				lores.add("6 yen");
+				lores.add(BimConfig.getPrice(Bims.TimerBim) + " yen");
 			} else {
 				lores.add("左クリック  ：構える(カウントダウン)");
 				lores.add("右クリック  ：投げる");
@@ -41,7 +42,7 @@ public class Items {
 		} else if (bims == Bims.CrackerBim) {
 			meta.setDisplayName(ChatColor.BLUE + "§lクラッカーBIM");
 			if (type == 0) {
-				lores.add("10 yen");
+				lores.add(BimConfig.getPrice(Bims.CrackerBim) + " yen");
 			} else {
 				lores.add("右クリック：投げる");
 				lores.add("ブロックやプレイヤーに当たった瞬間爆発する");
@@ -49,7 +50,7 @@ public class Items {
 		} else if (bims == Bims.FlameBim) {
 			meta.setDisplayName(ChatColor.DARK_RED + "§lフレイムBIM");
 			if (type == 0) {
-				lores.add("15 yen");
+				lores.add(BimConfig.getPrice(Bims.FlameBim) + " yen");
 			} else {
 				lores.add("右クリック：投げる");
 				lores.add("着弾地点から十字に火を放つ");
@@ -57,7 +58,7 @@ public class Items {
 		} else if (bims == Bims.HomingBim) {
 			meta.setDisplayName(ChatColor.LIGHT_PURPLE + "§lホーミングBIM");
 			if (type == 0) {
-				lores.add("20 yen");
+				lores.add(BimConfig.getPrice(Bims.HomingBim) + " yen");
 			} else {
 				lores.add("右クリック：投げる（前方にプレイヤーがいた場合）");
 				lores.add("ロックオンしたプレイヤーを追尾する");
@@ -69,7 +70,7 @@ public class Items {
 			skullmeta.setOwner("MHF_TNT");
 			skullmeta.setDisplayName(ChatColor.GREEN + "§l設置BIM");
 			if (type == 0) {
-				lores.add("30 yen");
+				lores.add(BimConfig.getPrice(Bims.InstallationBim) + " yen");
 			} else {
 				lores.add("右クリック：設置する");
 				lores.add("設置者以外が近付いたとき爆発する");
@@ -97,6 +98,7 @@ public class Items {
 			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.GREEN + "レーダー");
 			lores.add("手に埋め込まれたクリスタル");
+			lores.add("左クリック：BIM購入画面を開く");
 			lores.add("右クリック：一番近いプレイヤーを探知して示す");
 			break;
 		}

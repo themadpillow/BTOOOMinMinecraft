@@ -26,7 +26,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 
@@ -61,6 +60,7 @@ public class GameManager extends JavaPlugin implements Listener {
 	public void onEnable() {
 		TitleSender = new TitleSender();
 		config = this.getConfig();
+		bimDamageConfigCheck();
 
 		new TimerBim(this);
 		new CrackerBim(this);
@@ -85,11 +85,6 @@ public class GameManager extends JavaPlugin implements Listener {
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-			if (player.getScoreboard().getTeam("team") == null) {
-				player.getScoreboard().registerNewTeam("team");
-			}
-			player.getScoreboard().getTeam("team").setAllowFriendlyFire(true);
-			player.getScoreboard().getTeam("team").setNameTagVisibility(NameTagVisibility.HIDE_FOR_OTHER_TEAMS);
 
 			if ((boolean) config.get("Timer")) {
 				Objective objective;
@@ -126,15 +121,14 @@ public class GameManager extends JavaPlugin implements Listener {
 
 			}
 		}
-
-		bimDamageConfigCheck();
 	}
 
 	public void onDisable() {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player.getScoreboard() != null) {
-				player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
-				player.getScoreboard().getTeam("team").unregister();
+				if (player.getScoreboard().getObjective(DisplaySlot.SIDEBAR) != null) {
+					player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
+				}
 			}
 		}
 	}
@@ -174,8 +168,6 @@ public class GameManager extends JavaPlugin implements Listener {
 		}
 
 		for (Player p : Bukkit.getOnlinePlayers()) {
-			p.setDisplayName("");
-
 			getAlivelist().add(p);
 			getCanThrow().put(p, false);
 			getCanBuy().put(p, true);
@@ -187,7 +179,6 @@ public class GameManager extends JavaPlugin implements Listener {
 				p.getInventory().addItem(getItems().bims(Bims.TimerBim, (byte) 1));
 			}
 			p.getInventory().setItem(8, getItems().otherItem((byte) 0));
-			p.getScoreboard().getTeam("team").addPlayer(p);
 			p.teleport(respawn());
 
 			setMoney(p, 30);
@@ -227,8 +218,8 @@ public class GameManager extends JavaPlugin implements Listener {
 
 		double x = (Math.random() * range) - (range / 2);
 		double z = (Math.random() * range) - (range / 2);
-		for (int y = loc.getBlockY() + config.getInt("spawnMinHeight"); ; y++) {
-			if( y > config.getInt("spawnMaxHeight")) {
+		for (int y = loc.getBlockY() + config.getInt("spawnMinHeight");; y++) {
+			if (y > config.getInt("spawnMaxHeight")) {
 				y = loc.getBlockY() + config.getInt("spawnMinHeight");
 				x = (Math.random() * range) - (range / 2);
 				z = (Math.random() * range) - (range / 2);
@@ -371,7 +362,7 @@ public class GameManager extends JavaPlugin implements Listener {
 	}
 
 	public void addMoney(Player player, int addMoney) {
-		setMoney(player, getMoney(player) + 5);
+		setMoney(player, getMoney(player) + addMoney);
 	}
 
 	public List<Player> getAlivelist() {
